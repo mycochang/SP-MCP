@@ -4,7 +4,7 @@ Bridge between Super Productivity and MCP (Model Context Protocol) servers for C
 
 This MCP and plugin allows Claude Desktop to directly interact with Super Productivity through the MCP protocol. You can create tasks, update existing tasks, manage projects and tags, and get information from Super Productivity using natural language.
 
-https://github.com/user-attachments/assets/a1f9e0fc-8ab1-4de7-ae56-738cd42bd789
+[demo1](https://github.com/user-attachments/assets/a1f9e0fc-8ab1-4de7-ae56-738cd42bd789)
 https://github.com/user-attachments/assets/eb2adb22-e3c5-4f9c-a2b7-64079a5d2a55
 
 ## Requirements
