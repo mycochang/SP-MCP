@@ -6,7 +6,9 @@ This MCP and plugin allows Claude Desktop to directly interact with Super Produc
 
 
 ## Demo
+
 https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
+
 https://github.com/user-attachments/assets/5e6d90e0-646c-4b9b-8a88-c4fa7db0c86d
 
 
