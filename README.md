@@ -6,6 +6,8 @@ This MCP and plugin allows Claude Desktop to directly interact with Super Produc
 
 Only thing it can't do right now is delete tasks (but it can mark them as done).
 
+Make sure to backup your Super Productivity before using in case of data loss.
+
 ## Demo
 
 https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
