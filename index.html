@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Bridge - Super Productivity</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a1a;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: #2d2d2d;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-connected {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .status-disconnected {
+            background: #f44336;
+            color: white;
+        }
+
+        .status-initializing {
+            background: #FF9800;
+            color: white;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .card {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: #4fc3f7;
+            border-bottom: 2px solid #4fc3f7;
+            padding-bottom: 0.5rem;
+        }
+
+        .stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #404040;
+        }
+
+        .stat:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #b0b0b0;
+        }
+
+        .config-section {
+            grid-column: 1 / -1;
+        }
+
+        .config-form {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            font-size: 0.875rem;
+            color: #b0b0b0;
+        }
+
+        .form-group input {
+            padding: 0.5rem;
+            border: 1px solid #555;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            width: 120px;
+            background: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background: #4fc3f7;
+            color: #1a1a1a;
+        }
+
+        .btn-primary:hover {
+            background: #29b6f6;
+        }
+
+        .btn-secondary {
+            background: #424242;
+            color: #e0e0e0;
+        }
+
+        .btn-secondary:hover {
+            background: #616161;
+        }
+
+        .logs-section {
+            grid-column: 1 / -1;
+        }
+
+        .logs-container {
+            background: #1e1e1e;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 4px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+        }
+
+        .log-entry {
+            margin-bottom: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .log-info {
+            color: #4CAF50;
+        }
+
+        .log-warning {
+            color: #FF9800;
+        }
+
+        .log-error {
+            color: #f44336;
+        }
+
+        .log-timestamp {
+            color: #888;
+            font-size: 0.75rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .path-info {
+            background: #2d2d2d;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border-left: 4px solid #4fc3f7;
+            margin-top: 1rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+            word-break: break-all;
+        }
+
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .config-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔗 SP-MCP</h1>
+        <div class="status-badge" id="statusBadge">Ready</div>
+    </div>
+
+    <div class="container">
+        <div class="grid">
+            <!-- Statistics Card -->
+            <div class="card">
+                <h3>📊 Statistics</h3>
+                <div class="stat">
+                    <span class="stat-label">Status:</span>
+                    <span class="stat-value" id="statusText">Ready</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Commands Processed:</span>
+                    <span class="stat-value" id="commandsProcessed">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Errors:</span>
+                    <span class="stat-value" id="errorCount">0</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Last Command:</span>
+                    <span class="stat-value" id="lastCommand">None</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Uptime:</span>
+                    <span class="stat-value" id="uptime">0s</span>
+                </div>
+            </div>
+
+            <!-- MCP Info Card -->
+            <div class="card">
+                <h3>🔧 MCP Configuration</h3>
+                <div class="stat">
+                    <span class="stat-label">Data Directory:</span>
+                    <span class="stat-value" id="mcpPath">Not set</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Commands Dir:</span>
+                    <span class="stat-value" id="commandsDir">Not set</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Responses Dir:</span>
+                    <span class="stat-value" id="responsesDir">Not set</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Polling Frequency:</span>
+                    <span class="stat-value" id="currentPolling">2s</span>
+                </div>
+            </div>
+
+            <!-- Configuration Section -->
+            <div class="card config-section">
+                <h3>⚙️ Settings</h3>
+                <div class="config-form">
+                    <div class="form-group">
+                        <label for="pollingFrequency">Polling Frequency (seconds):</label>
+                        <input type="number" id="pollingFrequency" min="1" max="60" value="2" />
+                    </div>
+                    <button class="btn btn-primary" onclick="updatePollingFrequency()">Update</button>
+                    <button class="btn btn-secondary" onclick="clearLogs()">Clear Logs</button>
+                </div>
+                <div class="path-info" id="pathInfo">
+                    MCP data will be stored in your system's application data directory.
+                </div>
+            </div>
+
+            <!-- Logs Section -->
+            <div class="card logs-section">
+                <h3>📝 Activity Logs</h3>
+                <div class="logs-container" id="logsContainer">
+                    <div class="log-entry log-info">
+                        <span class="log-timestamp">[System]</span> MCP Bridge interface loaded
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let bridgeStatus = {
+            isInitialized: false,
+            stats: { commandsProcessed: 0, errors: 0, startTime: Date.now() },
+            mcpPath: null,
+            commandsDir: null,
+            responsesDir: null,
+            pollingFrequency: 2
+        };
+
+        function init() {
+            loadSettings();
+            updateUI();
+            startStatusUpdates();
+            window.addEventListener('message', handlePluginMessage);
+            requestPluginStatus();
+        }
+
+        function loadSettings() {
+            bridgeStatus.pollingFrequency = 2;
+            document.getElementById('pollingFrequency').value = bridgeStatus.pollingFrequency;
+        }
+
+
+        function handlePluginMessage(event) {
+            if (event.data && event.data.type === 'mcp-bridge-update') {
+                updateBridgeStatus(event.data.data);
+            }
+        }
+
+        function updateBridgeStatus(data) {
+            if (data.status) {
+                bridgeStatus.isInitialized = data.status.type === 'connected';
+            }
+            
+            if (data.stats) {
+                bridgeStatus.stats = { ...bridgeStatus.stats, ...data.stats };
+            }
+            
+            if (data.mcpPath) {
+                bridgeStatus.mcpPath = data.mcpPath;
+            }
+            
+            if (data.commandDir) {
+                bridgeStatus.commandsDir = data.commandDir;
+            }
+            
+            if (data.responseDir) {
+                bridgeStatus.responsesDir = data.responseDir;
+            }
+            
+            if (data.log) {
+                addLogEntry(data.log.message, data.log.type);
+            }
+            
+            updateUI();
+        }
+
+        function updateUI() {
+            // Update status
+            const statusBadge = document.getElementById('statusBadge');
+            const statusText = document.getElementById('statusText');
+            
+            if (bridgeStatus.isInitialized) {
+                statusBadge.textContent = 'Connected';
+                statusBadge.className = 'status-badge status-connected';
+                statusText.textContent = 'Connected to MCP';
+            } else {
+                statusBadge.textContent = 'Ready';
+                statusBadge.className = 'status-badge status-initializing';
+                statusText.textContent = 'Ready';
+            }
+            
+            // Update statistics
+            document.getElementById('commandsProcessed').textContent = bridgeStatus.stats.commandsProcessed || 0;
+            document.getElementById('errorCount').textContent = bridgeStatus.stats.errors || 0;
+            
+            if (bridgeStatus.stats.lastCommandTime) {
+                const lastCommand = new Date(bridgeStatus.stats.lastCommandTime).toLocaleTimeString();
+                document.getElementById('lastCommand').textContent = lastCommand;
+            }
+            
+            // Update uptime
+            const uptime = Math.floor((Date.now() - bridgeStatus.stats.startTime) / 1000);
+            document.getElementById('uptime').textContent = formatUptime(uptime);
+            
+            // Update MCP info
+            document.getElementById('mcpPath').textContent = bridgeStatus.mcpPath || 'Not set';
+            document.getElementById('commandsDir').textContent = bridgeStatus.commandsDir || 'Not set';
+            document.getElementById('responsesDir').textContent = bridgeStatus.responsesDir || 'Not set';
+            document.getElementById('currentPolling').textContent = bridgeStatus.pollingFrequency + 's';
+            
+            // Update path info
+            if (bridgeStatus.mcpPath) {
+                document.getElementById('pathInfo').textContent = `MCP data directory: ${bridgeStatus.mcpPath}`;
+            }
+        }
+
+        function formatUptime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+            
+            if (hours > 0) {
+                return `${hours}h ${minutes}m ${secs}s`;
+            } else if (minutes > 0) {
+                return `${minutes}m ${secs}s`;
+            } else {
+                return `${secs}s`;
+            }
+        }
+
+        function addLogEntry(message, type = 'info') {
+            const logsContainer = document.getElementById('logsContainer');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry log-${type}`;
+            logEntry.innerHTML = `<span class="log-timestamp">[${timestamp}]</span> ${message}`;
+            
+            logsContainer.appendChild(logEntry);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+            
+            // Keep only last 50 log entries
+            while (logsContainer.children.length > 50) {
+                logsContainer.removeChild(logsContainer.firstChild);
+            }
+        }
+
+        function updatePollingFrequency() {
+            const newFrequency = parseInt(document.getElementById('pollingFrequency').value);
+            if (newFrequency >= 1 && newFrequency <= 60) {
+                bridgeStatus.pollingFrequency = newFrequency;
+                
+                // Send message to plugin to update frequency (plugin handles saving)
+                sendMessageToPlugin({
+                    type: 'updatePollingFrequency',
+                    frequency: newFrequency
+                });
+                
+                addLogEntry(`Polling frequency updated to ${newFrequency} seconds`, 'info');
+                updateUI();
+            } else {
+                addLogEntry('Invalid polling frequency. Must be between 1 and 60 seconds.', 'error');
+            }
+        }
+
+        function forceCheck() {
+            sendMessageToPlugin({ type: 'forceCheck' });
+            addLogEntry('Force command check requested', 'info');
+        }
+
+        function clearLogs() {
+            document.getElementById('logsContainer').innerHTML = '';
+            addLogEntry('Logs cleared', 'info');
+        }
+
+
+        function sendMessageToPlugin(message) {
+            if (window.parent && window.parent.mcpBridge) {
+                if (message.type === 'updatePollingFrequency') {
+                    window.parent.mcpBridge.updatePollingFrequency(message.frequency);
+                } else if (message.type === 'forceCheck') {
+                    window.parent.mcpBridge.forceCommandCheck();
+                }
+            } else {
+                addLogEntry('Could not communicate with plugin', 'warning');
+            }
+        }
+
+        function requestPluginStatus() {
+            if (window.parent && window.parent.mcpBridge) {
+                const status = window.parent.mcpBridge.getStatus();
+                if (status) {
+                    updateBridgeStatus(status);
+                }
+            }
+        }
+
+        function startStatusUpdates() {
+            setInterval(() => {
+                updateUI();
+                requestPluginStatus();
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
