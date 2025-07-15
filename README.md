@@ -1,16 +1,14 @@
 # SP-MCP
 
-Bridge between Super Productivity and MCP (Model Context Protocol) servers for Claude Desktop integration.
+Bridge between the amazing [Super Productivity](https://github.com/johannesjo/super-productivity/) app and MCP (Model Context Protocol) servers for Claude Desktop integration.
 
 This MCP and plugin allows Claude Desktop to directly interact with Super Productivity through the MCP protocol. You can create tasks, update existing tasks, manage projects and tags, and get information from Super Productivity using natural language.
 
+Only thing it can't do right now is delete tasks (but it can mark them as done).
 
 ## Demo
 
 https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
-
-https://github.com/user-attachments/assets/5e6d90e0-646c-4b9b-8a88-c4fa7db0c86d
-
 
 
 ## Requirements
