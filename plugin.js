@@ -460,7 +460,30 @@ class MCPBridgePlugin {
           break;
           
         case 'addTask':
-          result = await PluginAPI.addTask(command.data);
+          // Check if this is a subtask with SP syntax (@, #, +)
+          if (command.data.parentId && (command.data.title.includes('@') || command.data.title.includes('#') || command.data.title.includes('+'))) {
+            await this.log(`Subtask with syntax detected: ${command.data.title}`);
+            
+            // Step 1: Create subtask without SP syntax
+            const titleWithoutSyntax = command.data.title
+              .replace(/@\w+/g, '')
+              .replace(/#\w+/g, '')
+              .replace(/\+\w+/g, '')
+              .trim();
+            const taskData = { ...command.data, title: titleWithoutSyntax };
+            
+            await this.log(`Creating subtask without syntax: ${titleWithoutSyntax}`);
+            const taskId = await PluginAPI.addTask(taskData);
+            
+            // Step 2: Update with original title to trigger syntax parsing
+            await this.log(`Updating subtask with original title: ${command.data.title}`);
+            await PluginAPI.updateTask(taskId, { title: command.data.title });
+            
+            result = taskId;
+          } else {
+            // Regular task creation
+            result = await PluginAPI.addTask(command.data);
+          }
           break;
           
         case 'updateTask':
