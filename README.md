@@ -4,7 +4,7 @@ Bridge between Super Productivity and MCP (Model Context Protocol) servers for C
 
 This MCP and plugin allows Claude Desktop to directly interact with Super Productivity through the MCP protocol. You can create tasks, update existing tasks, manage projects and tags, and get information from Super Productivity using natural language.
 
-[demo1](https://github.com/user-attachments/assets/a1f9e0fc-8ab1-4de7-ae56-738cd42bd789](https://github-production-user-asset-6210df.s3.amazonaws.com/220924574/466643832-a1f9e0fc-8ab1-4de7-ae56-738cd42bd789.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250715%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250715T182028Z&X-Amz-Expires=300&X-Amz-Signature=7dc5afad4053174a21e5b307c556a26a04a087aedf222d6c1d0e8525095ab941&X-Amz-SignedHeaders=host)
+[[demo1](https://github.com/user-attachments/assets/a1f9e0fc-8ab1-4de7-ae56-738cd42bd789](https://github-production-user-asset-6210df.s3.amazonaws.com/220924574/466643832-a1f9e0fc-8ab1-4de7-ae56-738cd42bd789.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250715%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250715T182028Z&X-Amz-Expires=300&X-Amz-Signature=7dc5afad4053174a21e5b307c556a26a04a087aedf222d6c1d0e8525095ab941&X-Amz-SignedHeaders=host)](https://github-production-user-asset-6210df.s3.amazonaws.com/220924574/466643832-a1f9e0fc-8ab1-4de7-ae56-738cd42bd789.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20250715%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250715T182028Z&X-Amz-Expires=300&X-Amz-Signature=7dc5afad4053174a21e5b307c556a26a04a087aedf222d6c1d0e8525095ab941&X-Amz-SignedHeaders=host)
 
 
 https://github.com/user-attachments/assets/eb2adb22-e3c5-4f9c-a2b7-64079a5d2a55
