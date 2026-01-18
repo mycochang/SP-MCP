@@ -206,6 +206,36 @@ class SuperProductivityMCPServer:
                     }
                 ),
                 types.Tool(
+                    name="update_tag",
+                    description="Update an existing tag",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "tag_id": {
+                                "type": "string",
+                                "description": "Tag ID to update"
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "New tag title"
+                            },
+                            "color": {
+                                "type": "string",
+                                "description": "New tag color (hex code)"
+                            },
+                            "icon": {
+                                "type": "string",
+                                "description": "Material Icon name (e.g. wb_sunny)"
+                            },
+                            "theme_primary_color": {
+                                "type": "string",
+                                "description": "Theme primary color (hex code) - use this to fix background tint"
+                            }
+                        },
+                        "required": ["tag_id"]
+                    }
+                ),
+                types.Tool(
                     name="delete_tag",
                     description="Delete a tag",
                     inputSchema={
@@ -271,6 +301,8 @@ class SuperProductivityMCPServer:
                     result = await self.get_tags(arguments)
                 elif name == "create_tag":
                     result = await self.create_tag(arguments)
+                elif name == "update_tag":
+                    result = await self.update_tag(arguments)
                 elif name == "delete_tag":
                     result = await self.delete_tag(arguments)
                 elif name == "show_notification":
@@ -431,6 +463,35 @@ class SuperProductivityMCPServer:
         }
         
         return await self.send_command("addTag", data=tag_data)
+    
+    async def update_tag(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a tag"""
+        tag_id = args.get("tag_id")
+        if not tag_id:
+            return {"success": False, "error": "tag_id is required"}
+        
+        updates = {}
+        if "title" in args:
+            updates["title"] = args["title"]
+        if "color" in args:
+            updates["color"] = args["color"]
+        if "icon" in args:
+            updates["icon"] = args["icon"]
+            
+        # Handle theme updates specially
+        if "theme_primary_color" in args:
+            updates["theme"] = {
+                "primary": args["theme_primary_color"],
+                "huePrimary": "500",
+                "accent": "#ff4081",
+                "hueAccent": "500",
+                "warn": "#e11826",
+                "hueWarn": "500",
+                "isAutoContrast": True,
+                "isDisableBackgroundTint": False
+            }
+            
+        return await self.send_command("updateTag", tagId=tag_id, data=updates)
     
     async def delete_tag(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Delete a tag"""

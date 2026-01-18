@@ -87,6 +87,36 @@ async function runTests() {
         failed++; // We expect this to fail now
     }
 
+    // --- TEST 3: Feature - Update Tag (TDD) ---
+    try {
+        console.log('\n🧪 TEST 3: Update Tag Feature Check');
+        const plugin = setupEnv();
+        const updateCommand = {
+            action: 'updateTag',
+            tagId: 'TAG_123',
+            data: { title: 'New Title', theme: { primary: '#ff0000' } }
+        };
+        const cmdInfo = {
+            command: updateCommand,
+            filename: 'update_cmd.json',
+            path: path.join(cmdDir, 'update_cmd.json')
+        };
+        fs.writeFileSync(cmdInfo.path, JSON.stringify(updateCommand));
+        
+        await plugin.executeCommand(cmdInfo);
+        
+        const call = PluginAPI.calls.find(c => c.method === 'updateTag');
+        if (!call) throw new Error('PluginAPI.updateTag was NOT called.');
+        if (call.args[0] !== 'TAG_123') throw new Error(`Wrong ID: ${call.args[0]}`);
+        if (call.args[1].title !== 'New Title') throw new Error(`Wrong Data: ${JSON.stringify(call.args[1])}`);
+        
+        console.log('✅ PASS');
+        passed++;
+    } catch(e) {
+        console.error('❌ FAIL:', e.message);
+        failed++;
+    }
+
     // --- Cleanup ---
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true });
     
