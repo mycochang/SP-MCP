@@ -1,8 +1,0 @@
-{
-  "track_id": "update-task-tags_20260118",
-  "type": "feature",
-  "status": "new",
-  "created_at": "2026-01-18T19:20:00Z",
-  "updated_at": "2026-01-18T19:20:00Z",
-  "description": "Add Tag Assignment to update_task"
-}
