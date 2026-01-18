@@ -56,7 +56,10 @@ global.PluginAPI = {
     showSnack: () => {},
     log: () => {},
     getTasks: async () => [], 
-    updateTask: async () => {},
+    updateTask: async (taskId, data) => {
+        global.PluginAPI.calls.push({ method: 'updateTask', args: [taskId, data] });
+        return { success: true };
+    },
     addProject: async () => {},
     addTask: async () => {}
 };

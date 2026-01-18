@@ -148,6 +148,80 @@ async function runTests() {
         failed++;
     }
 
+    // --- TEST 5: Feature - Update Task Tags (Probe) ---
+    try {
+        console.log('\n🧪 TEST 5: Update Task Tags Feature Check (Probe)');
+        const plugin = setupEnv();
+        const updateTaskCommand = {
+            action: 'updateTask',
+            taskId: 'TASK_1',
+            data: { tagIds: ['TAG_A', 'TAG_B'] }
+        };
+        const cmdInfo = {
+            command: updateTaskCommand,
+            filename: 'update_task_tags.json',
+            path: path.join(cmdDir, 'update_task_tags.json')
+        };
+        fs.writeFileSync(cmdInfo.path, JSON.stringify(updateTaskCommand));
+        
+        await plugin.executeCommand(cmdInfo);
+        
+        const call = PluginAPI.calls.find(c => c.method === 'updateTask');
+        if (!call) throw new Error('PluginAPI.updateTask was NOT called.');
+        if (call.args[0] !== 'TASK_1') throw new Error(`Wrong ID: ${call.args[0]}`);
+        if (!call.args[1].tagIds || call.args[1].tagIds.length !== 2) {
+            throw new Error(`tagIds NOT passed correctly: ${JSON.stringify(call.args[1])}`);
+        }
+        
+        console.log('✅ PASS');
+        passed++;
+    } catch(e) {
+        console.error('❌ FAIL:', e.message);
+        failed++;
+    }
+
+    // --- TEST 6: Feature - Update Task Tags (Explicit Support) ---
+    try {
+        console.log('\n🧪 TEST 6: Update Task Tags (Explicit Logging Check)');
+        const plugin = setupEnv();
+        const updateTaskCommand = {
+            action: 'updateTask',
+            taskId: 'TASK_1',
+            data: { tagIds: ['TAG_A'] }
+        };
+        const cmdInfo = {
+            command: updateTaskCommand,
+            filename: 'update_tags_log.json',
+            path: path.join(cmdDir, 'update_tags_log.json')
+        };
+        fs.writeFileSync(cmdInfo.path, JSON.stringify(updateTaskCommand));
+        
+        // Intercept console.log
+        const originalLog = console.log;
+        let logFound = false;
+        console.log = (...args) => {
+            if (args.join(' ').includes('Updating task tags for TASK_1')) {
+                logFound = true;
+            }
+            // originalLog(...args); // Optional: keep output
+        };
+
+        await plugin.executeCommand(cmdInfo);
+        
+        // Restore
+        console.log = originalLog;
+
+        if (!logFound) {
+            throw new Error('Explicit log for tag update was NOT found in console output.');
+        }
+        
+        console.log('✅ PASS');
+        passed++;
+    } catch(e) {
+        console.error('❌ FAIL:', e.message);
+        failed++;
+    }
+
     // --- Cleanup ---
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true });
     

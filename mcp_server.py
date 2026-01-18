@@ -131,6 +131,11 @@ class SuperProductivityMCPServer:
                                 "type": "integer",
                                 "description": "Time spent in milliseconds",
                             },
+                            "tag_ids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of tag IDs to assign to the task. This will replace any existing tags.",
+                            },
                         },
                         "required": ["task_id"],
                     },
@@ -435,6 +440,8 @@ class SuperProductivityMCPServer:
             updates["timeEstimate"] = args["time_estimate"]
         if "time_spent" in args:
             updates["timeSpent"] = args["time_spent"]
+        if "tag_ids" in args:
+            updates["tagIds"] = args["tag_ids"]
 
         return await self.send_command("updateTask", taskId=task_id, data=updates)
 

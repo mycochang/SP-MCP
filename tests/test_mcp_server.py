@@ -67,5 +67,24 @@ class TestMCPServer(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(data["theme"]["primary"], "#ff0000")
         self.assertEqual(data["theme"]["huePrimary"], "500")
 
+    async def test_update_task_tag_ids(self):
+        """Verify update_task maps tag_ids to tagIds"""
+        self.mcp.send_command = MagicMock()
+        future = asyncio.Future()
+        future.set_result({"success": True})
+        self.mcp.send_command.return_value = future
+
+        await self.mcp.update_task({
+            "task_id": "TASK_1",
+            "tag_ids": ["A", "B"]
+        })
+
+        self.mcp.send_command.assert_called_once()
+        call_args = self.mcp.send_command.call_args
+        data = call_args[1]['data']
+        
+        self.assertIn("tagIds", data)
+        self.assertEqual(data["tagIds"], ["A", "B"])
+
 if __name__ == '__main__':
     unittest.main()

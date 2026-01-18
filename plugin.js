@@ -487,6 +487,9 @@ class MCPBridgePlugin {
           break;
           
         case 'updateTask':
+          if (command.data.tagIds) {
+            await this.log(`Updating task tags for ${command.taskId}: ${command.data.tagIds.join(', ')}`);
+          }
           result = await PluginAPI.updateTask(command.taskId, command.data);
           break;
           
