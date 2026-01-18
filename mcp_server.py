@@ -206,6 +206,20 @@ class SuperProductivityMCPServer:
                     }
                 ),
                 types.Tool(
+                    name="delete_tag",
+                    description="Delete a tag",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "tag_id": {
+                                "type": "string",
+                                "description": "Tag ID to delete"
+                            }
+                        },
+                        "required": ["tag_id"]
+                    }
+                ),
+                types.Tool(
                     name="show_notification",
                     description="Show a notification in Super Productivity",
                     inputSchema={
@@ -257,6 +271,8 @@ class SuperProductivityMCPServer:
                     result = await self.get_tags(arguments)
                 elif name == "create_tag":
                     result = await self.create_tag(arguments)
+                elif name == "delete_tag":
+                    result = await self.delete_tag(arguments)
                 elif name == "show_notification":
                     result = await self.show_notification(arguments)
                 elif name == "debug_directories":
@@ -415,6 +431,11 @@ class SuperProductivityMCPServer:
         }
         
         return await self.send_command("addTag", data=tag_data)
+    
+    async def delete_tag(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Delete a tag"""
+        tag_id = args.get("tag_id")
+        return await self.send_command("deleteTag", tagId=tag_id)
     
     async def show_notification(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Show a notification"""

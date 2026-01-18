@@ -596,7 +596,7 @@ class MCPBridgePlugin {
           break;
           
         case 'deleteTag':
-          result = { error: 'Tag deletion not supported via Plugin API.' };
+          result = await PluginAPI.deleteTag(command.tagId);
           break;
 
         // UI operations
