@@ -14,6 +14,7 @@ SP-MCP provides a local, low-latency bridge that brings AI intelligence to perso
 - **Natural Language Translation:** Sophisticated parsing of natural language time and date references into Super Productivity's internal `@syntax` (e.g., "@fri 3pm").
 - **Bidirectional Event Sync:** Real-time (or near-real-time) synchronization where actions in Super Productivity (like completing a task) are reflected back to the MCP client.
 - **Task & Project Management:** Full support for creating, reading, and updating tasks, projects, and tags.
+- **Board Management:** Support for creating and managing Kanban board configurations within Super Productivity.
 
 ## Non-Functional Requirements
 - **Performance-First Polling:** The file-based communication must remain highly efficient to ensure zero impact on the Electron application's UI responsiveness.
