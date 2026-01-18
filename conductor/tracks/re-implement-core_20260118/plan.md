@@ -9,7 +9,7 @@
     - [ ] Update `mcp_server.py` with `delete_tag` tool
     - [ ] Update `plugin.js` to handle `deleteTag` action using `PluginAPI.deleteTag`
     - [ ] Verify tests pass
-- [ ] Task: Implement `update_tag`
+- [x] Task: Implement `update_tag` [commit: 4fd4138]
     - [ ] Write failing test for `update_tag` with theme color mapping
     - [ ] Update `mcp_server.py` with `update_tag` tool
     - [ ] Update `plugin.js` to handle `updateTag` action
