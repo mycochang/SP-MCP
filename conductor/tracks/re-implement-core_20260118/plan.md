@@ -1,0 +1,34 @@
+# Implementation Plan - Re-implement Core Features & Board Support
+
+## Phase 1: Tag Management Infrastructure
+- [ ] Task: Set up TDD environment for Python and Node.js
+    - [ ] Write Node.js test harness for `PluginAPI` mocks
+    - [ ] Write Python unit tests for `SuperProductivityMCPServer` tool definitions
+- [ ] Task: Implement `delete_tag`
+    - [ ] Write failing test for `delete_tag` command flow
+    - [ ] Update `mcp_server.py` with `delete_tag` tool
+    - [ ] Update `plugin.js` to handle `deleteTag` action using `PluginAPI.deleteTag`
+    - [ ] Verify tests pass
+- [ ] Task: Implement `update_tag`
+    - [ ] Write failing test for `update_tag` with theme color mapping
+    - [ ] Update `mcp_server.py` with `update_tag` tool
+    - [ ] Update `plugin.js` to handle `updateTag` action
+    - [ ] Verify tests pass
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Tag Management' (Protocol in workflow.md)
+
+## Phase 2: Board Management Fix
+- [ ] Task: Verify Board Action String
+    - [ ] Search Super Productivity source (or logs) for exact `addBoard` action type string
+    - [ ] Update `plugin.js` with the verified action string
+- [ ] Task: Implement `create_board`
+    - [ ] Write failing test for `create_board` tool-to-plugin flow
+    - [ ] Update `mcp_server.py` with `create_board` tool
+    - [ ] Update `plugin.js` to handle `addBoard` action
+    - [ ] Verify tests pass
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Board Management' (Protocol in workflow.md)
+
+## Phase 3: Stabilization & Cleanup
+- [ ] Task: Final regression testing
+    - [ ] Run security regression tests (Path Traversal)
+    - [ ] Verify 90% code coverage
+- [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Acceptance' (Protocol in workflow.md)
