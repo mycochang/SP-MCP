@@ -75,6 +75,33 @@ async function runTests() {
         console.error('❌ ERROR executing command:', e);
     }
 
+    // TEST 3: Feature - Create Board (Verify Action Dispatch)
+    console.log('\n🧪 TEST 3: Create Board Feature Check');
+    const boardCommand = {
+        action: 'createBoard',
+        data: { title: 'Test Board', cols: 3 }
+    };
+    const boardCmdInfo = {
+        command: boardCommand,
+        filename: 'board_cmd.json',
+        path: path.join(cmdDir, 'board_cmd.json')
+    };
+    fs.writeFileSync(boardCmdInfo.path, JSON.stringify(boardCommand));
+    
+    try {
+        await plugin.executeCommand(boardCmdInfo);
+        const call = PluginAPI.calls.find(c => c.method === 'dispatchAction' && c.args[0].type === '[Boards] Add Board');
+        
+        if (call) {
+             console.log('✅ PASS: PluginAPI.dispatchAction called with "[Boards] Add Board"');
+        } else {
+             console.error('❌ FAIL: dispatchAction NOT called with correct type.');
+             console.log('Actual calls:', PluginAPI.calls);
+        }
+    } catch(e) {
+        console.error('❌ ERROR executing board command:', e);
+    }
+
     // Cleanup
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true });
 }

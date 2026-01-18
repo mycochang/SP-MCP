@@ -43,6 +43,11 @@ global.PluginAPI = {
          return { success: true };
     },
 
+    dispatchAction: async (action) => {
+        global.PluginAPI.calls.push({ method: 'dispatchAction', args: [action] });
+        return { success: true };
+    },
+
     registerHook: () => {},
     registerMenuEntry: () => {},
     showSnack: () => {},
