@@ -25,7 +25,7 @@
     - [ ] Update `mcp_server.py` with `create_board` tool
     - [ ] Update `plugin.js` to handle `addBoard` action
     - [ ] Verify tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Board Management' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Board Management' (Protocol in workflow.md) [checkpoint: dddce95]
 
 ## Phase 3: Stabilization & Cleanup
 - [ ] Task: Final regression testing
