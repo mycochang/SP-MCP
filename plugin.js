@@ -723,7 +723,8 @@ class MCPBridgePlugin {
         const path = require('path');
         
         const responseDir = args[0];
-        const commandId = args[1];
+        // SANITIZATION: Ensure commandId cannot escape the directory
+        const commandId = path.basename(args[1]);
         const response = args[2];
         
         try {
