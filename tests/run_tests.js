@@ -117,6 +117,37 @@ async function runTests() {
         failed++;
     }
 
+    // --- TEST 4: Feature - Create Board (TDD) ---
+    try {
+        console.log('\n🧪 TEST 4: Create Board Feature Check');
+        const plugin = setupEnv();
+        const boardCommand = {
+            action: 'addBoard',
+            data: { title: 'New Board', cols: 3, panels: [] }
+        };
+        const cmdInfo = {
+            command: boardCommand,
+            filename: 'board_cmd.json',
+            path: path.join(cmdDir, 'board_cmd.json')
+        };
+        fs.writeFileSync(cmdInfo.path, JSON.stringify(boardCommand));
+        
+        await plugin.executeCommand(cmdInfo);
+        
+        const call = PluginAPI.calls.find(c => c.method === 'dispatchAction');
+        if (!call) throw new Error('PluginAPI.dispatchAction was NOT called.');
+        
+        const action = call.args[0];
+        if (action.type !== '[Boards] Add Board') throw new Error(`Wrong Action Type: ${action.type}`);
+        if (action.boardCfg.title !== 'New Board') throw new Error(`Wrong Data: ${JSON.stringify(action.boardCfg)}`);
+        
+        console.log('✅ PASS');
+        passed++;
+    } catch(e) {
+        console.error('❌ FAIL:', e.message);
+        failed++;
+    }
+
     // --- Cleanup ---
     if (fs.existsSync(testDir)) fs.rmSync(testDir, { recursive: true });
     

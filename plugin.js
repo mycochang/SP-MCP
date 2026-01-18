@@ -599,6 +599,16 @@ class MCPBridgePlugin {
           result = await PluginAPI.deleteTag(command.tagId);
           break;
 
+        // Board Management (Added for MCP)
+        case "createBoard":
+        case "addBoard":
+          await PluginAPI.dispatchAction({
+            type: "[Boards] Add Board",
+            boardCfg: command.data,
+          });
+          result = { success: true, message: "Board created" };
+          break;
+
         // UI operations
         case 'showSnack':
           try {
