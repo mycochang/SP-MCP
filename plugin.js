@@ -604,7 +604,7 @@ class MCPBridgePlugin {
         case "addBoard":
           await PluginAPI.dispatchAction({
             type: "[Boards] Add Board",
-            boardCfg: command.data,
+            board: command.data,
           });
           result = { success: true, message: "Board created" };
           break;

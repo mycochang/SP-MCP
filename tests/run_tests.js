@@ -139,7 +139,7 @@ async function runTests() {
         
         const action = call.args[0];
         if (action.type !== '[Boards] Add Board') throw new Error(`Wrong Action Type: ${action.type}`);
-        if (action.boardCfg.title !== 'New Board') throw new Error(`Wrong Data: ${JSON.stringify(action.boardCfg)}`);
+        if (action.board.title !== 'New Board') throw new Error(`Wrong Data: ${JSON.stringify(action.board)}`);
         
         console.log('✅ PASS');
         passed++;
