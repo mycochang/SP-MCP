@@ -14,7 +14,7 @@
     - [ ] Update `mcp_server.py` with `update_tag` tool
     - [ ] Update `plugin.js` to handle `updateTag` action
     - [ ] Verify tests pass
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Tag Management' (Protocol in workflow.md)
+- [~] Task: Conductor - User Manual Verification 'Phase 1: Tag Management' (Protocol in workflow.md)
 
 ## Phase 2: Board Management Fix
 - [ ] Task: Verify Board Action String
