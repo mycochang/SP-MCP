@@ -1,10 +1,10 @@
 # Implementation Plan - Re-implement Core Features & Board Support
 
 ## Phase 1: Tag Management Infrastructure
-- [ ] Task: Set up TDD environment for Python and Node.js
-    - [ ] Write Node.js test harness for `PluginAPI` mocks
-    - [ ] Write Python unit tests for `SuperProductivityMCPServer` tool definitions
-- [ ] Task: Implement `delete_tag`
+- [x] Task: Set up TDD environment for Python and Node.js
+    - [x] Write Node.js test harness for `PluginAPI` mocks
+    - [x] Write Python unit tests for `SuperProductivityMCPServer` tool definitions
+- [x] Task: Implement `delete_tag` [commit: 15bdd31]
     - [ ] Write failing test for `delete_tag` command flow
     - [ ] Update `mcp_server.py` with `delete_tag` tool
     - [ ] Update `plugin.js` to handle `deleteTag` action using `PluginAPI.deleteTag`
