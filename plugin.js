@@ -682,6 +682,23 @@ class MCPBridgePlugin {
           result = await PluginAPI.loadSyncedData(command.key);
           break;
 
+        // Habit operations
+        case 'addHabit':
+          result = await PluginAPI.addHabit(command.data.title, command.data);
+          break;
+          
+        case 'checkHabit':
+          result = await PluginAPI.checkHabit(command.habitId);
+          break;
+          
+        case 'updateHabit':
+          result = await PluginAPI.updateHabit(command.habitId, command.updates);
+          break;
+          
+        case 'getAllSimpleCounters':
+          result = await PluginAPI.getAllSimpleCounters();
+          break;
+
         // Custom batch operations
         case 'batchOperation':
           result = await this.executeBatchOperation(command.operations);

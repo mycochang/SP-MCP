@@ -56,6 +56,25 @@ global.PluginAPI = {
         return null;
     },
 
+    // Habit Mocks
+    addHabit: async (title, cfg) => {
+        global.PluginAPI.calls.push({ method: 'addHabit', args: [title, cfg] });
+        // Simulate returning an ID
+        return 'HABIT_ID_' + Date.now();
+    },
+    checkHabit: async (id) => {
+        global.PluginAPI.calls.push({ method: 'checkHabit', args: [id] });
+        return;
+    },
+    updateHabit: async (id, updates) => {
+        global.PluginAPI.calls.push({ method: 'updateHabit', args: [id, updates] });
+        return;
+    },
+    getAllSimpleCounters: async () => {
+        global.PluginAPI.calls.push({ method: 'getAllSimpleCounters', args: [] });
+        return [];
+    },
+
     // Stubs to prevent crashes
     registerHook: () => {},
     registerMenuEntry: () => {},

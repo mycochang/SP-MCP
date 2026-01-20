@@ -284,6 +284,51 @@ class SuperProductivityMCPServer:
                     description="Debug the communication directories and show their status",
                     inputSchema={"type": "object", "properties": {}},
                 ),
+                types.Tool(
+                    name="add_habit",
+                    description="Create a new habit. ALWAYS use list_habits to check for duplicates before creating a new habit.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string", "description": "Habit title"},
+                            "streak_min_value": {
+                                "type": "integer",
+                                "description": "Daily target (e.g. 5 times per day)",
+                                "default": 1
+                            }
+                        },
+                        "required": ["title"]
+                    }
+                ),
+                types.Tool(
+                    name="check_habit",
+                    description="Check off (increment) a habit for today",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "habit_id": {"type": "string", "description": "ID of the habit"}
+                        },
+                        "required": ["habit_id"]
+                    }
+                ),
+                types.Tool(
+                    name="update_habit",
+                    description="Update a habit's configuration",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "habit_id": {"type": "string", "description": "ID of the habit"},
+                            "title": {"type": "string", "description": "New title"},
+                            "streak_min_value": {"type": "integer", "description": "New daily target"}
+                        },
+                        "required": ["habit_id"]
+                    }
+                ),
+                types.Tool(
+                    name="list_habits",
+                    description="List all habits and simple counters",
+                    inputSchema={"type": "object", "properties": {}}
+                )
             ]
 
         @self.server.call_tool()
@@ -318,6 +363,14 @@ class SuperProductivityMCPServer:
                     result = await self.show_notification(arguments)
                 elif name == "debug_directories":
                     result = await self.debug_directories(arguments)
+                elif name == "add_habit":
+                    result = await self.add_habit(arguments)
+                elif name == "check_habit":
+                    result = await self.check_habit(arguments)
+                elif name == "update_habit":
+                    result = await self.update_habit(arguments)
+                elif name == "list_habits":
+                    result = await self.list_habits(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -540,6 +593,43 @@ class SuperProductivityMCPServer:
                 "responses": self.response_dir.exists(),
             },
         }
+
+    async def add_habit(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a new habit"""
+        title = args.get("title")
+        if not title:
+            return {"success": False, "error": "title is required"}
+            
+        data = {
+            "title": title,
+            "streakMinValue": args.get("streak_min_value", 1)
+        }
+        return await self.send_command("addHabit", data=data)
+
+    async def check_habit(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Check off a habit"""
+        habit_id = args.get("habit_id")
+        if not habit_id:
+            return {"success": False, "error": "habit_id is required"}
+        return await self.send_command("checkHabit", habitId=habit_id)
+
+    async def update_habit(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a habit"""
+        habit_id = args.get("habit_id")
+        if not habit_id:
+            return {"success": False, "error": "habit_id is required"}
+            
+        updates = {}
+        if "title" in args:
+            updates["title"] = args["title"]
+        if "streak_min_value" in args:
+            updates["streakMinValue"] = args["streak_min_value"]
+            
+        return await self.send_command("updateHabit", habitId=habit_id, updates=updates)
+
+    async def list_habits(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """List all habits"""
+        return await self.send_command("getAllSimpleCounters")
 
     async def run(self):
         """Run the MCP server"""
