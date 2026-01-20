@@ -9,3 +9,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 **Owner:** connor
 **Description:** Restoring the activate_skill functionality and prompt registration.
 
+---
+
+- [x] **Track: Implement MCP Habit Management**
+*Link: [./tracks/mcp-habit-management_20260120/](./tracks/mcp-habit-management_20260120/)*
+
