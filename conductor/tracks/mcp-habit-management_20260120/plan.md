@@ -1,16 +1,16 @@
 # Implementation Plan - Implement MCP Habit Management
 
-## Phase 1: API Integration & Tooling
-- [~] Task: Create a reproduction/exploration script `tests/explore_habits_api.js` to verify `PluginAPI` methods.
-    - [ ] Mock `addHabit`, `checkHabit`, `updateHabit`, and `getAllSimpleCounters` in `test_harness.js`.
-    - [ ] Verify that `plugin.js` can correctly dispatch these commands.
+## Phase 1: API Integration & Tooling [checkpoint: 9d1804e]
+- [x] Task: Create a reproduction/exploration script `tests/explore_habits_api.js` to verify `PluginAPI` methods.
+    - [x] Mock `addHabit`, `checkHabit`, `updateHabit`, and `getAllSimpleCounters` in `test_harness.js`.
+    - [x] Verify that `plugin.js` can correctly dispatch these commands.
 - [x] Task: Implement Habit tools in `mcp_server.py`.
     - [x] Add `add_habit`, `check_habit`, `update_habit`, `list_habits` to `list_tools`.
     - [x] Implement the handler logic to send commands to the plugin.
 - [x] Task: Implement Command Handlers in `plugin.js`.
     - [x] Add cases for `addHabit`, `checkHabit`, `updateHabit`, `getAllSimpleCounters`.
     - [x] Ensure they call the corresponding `PluginAPI` methods.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: API Integration & Tooling' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: API Integration & Tooling' (Protocol in workflow.md)
 
 ## Phase 2: Workflow & Validation
 - [ ] Task: Update `mcp_server.py` tool descriptions to enforce the "Verify First" workflow.
