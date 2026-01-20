@@ -22,5 +22,5 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Workflow & Validation' (Protocol in workflow.md)
 
 ## Phase 3: Cleanup
-- [ ] Task: Remove exploration scripts.
+- [x] Task: Remove exploration scripts.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Cleanup' (Protocol in workflow.md)
