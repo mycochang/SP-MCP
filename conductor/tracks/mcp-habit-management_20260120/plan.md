@@ -13,12 +13,12 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: API Integration & Tooling' (Protocol in workflow.md)
 
 ## Phase 2: Workflow & Validation
-- [ ] Task: Update `mcp_server.py` tool descriptions to enforce the "Verify First" workflow.
-    - [ ] Update `add_habit` description to explicitly state: "ALWAYS use list_habits to check for duplicates before creating a new habit."
-- [ ] Task: Create a comprehensive test `tests/test_habit_workflow.js`.
-    - [ ] Simulate the flow: List -> Check Existence -> Add (if missing) or Skip.
-    - [ ] Verify `check_habit` increments the counter.
-- [ ] Task: Re-zip `plugin.zip` with the new changes.
+- [x] Task: Update `mcp_server.py` tool descriptions to enforce the "Verify First" workflow.
+    - [x] Update `add_habit` description to explicitly state: "ALWAYS use list_habits to check for duplicates before creating a new habit."
+- [x] Task: Create a comprehensive test `tests/test_habit_workflow.js`.
+    - [x] Simulate the flow: List -> Check Existence -> Add (if missing) or Skip.
+    - [x] Verify `check_habit` increments the counter.
+- [x] Task: Re-zip `plugin.zip` with the new changes.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Workflow & Validation' (Protocol in workflow.md)
 
 ## Phase 3: Cleanup
