@@ -1,0 +1,8 @@
+{
+  "track_id": "fix-project-list_20260120",
+  "type": "bug",
+  "status": "new",
+  "created_at": "2026-01-20T00:00:00Z",
+  "updated_at": "2026-01-20T00:00:00Z",
+  "description": "Fix issue where get_projects fails to list all active projects, specifically those with 0 tasks or recently created."
+}
