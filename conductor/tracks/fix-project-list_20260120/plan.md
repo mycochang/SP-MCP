@@ -11,11 +11,12 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Reproduction and Analysis' (Protocol in workflow.md)
 
 ## Phase 2: Fix Implementation
-- [ ] Task: Modify `plugin.js` to ensure `getAllProjects` retrieves all active projects, regardless of task count.
-    - [ ] Remove or adjust any filtering that depends on `tasks.length > 0`.
-    - [ ] Ensure `PluginAPI.getAllProjects` maps correctly to the internal SP store.
-- [ ] Task: Verify the fix with the reproduction script (GREEN state).
-- [ ] Task: Run existing tests to ensure no regressions.
+- [x] Task: Modify `plugin.js` to ensure `getAllProjects` retrieves all active projects, regardless of task count.
+    - [x] Remove or adjust any filtering that depends on `tasks.length > 0`.
+    - [x] Ensure `PluginAPI.getAllProjects` maps correctly to the internal SP store.
+- [x] Task: Verify the fix with the reproduction script (GREEN state).
+- [x] Task: Re-zip `plugin.js` and `manifest.json` into `plugin.zip`.
+- [x] Task: Run existing tests to ensure no regressions.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Fix Implementation' (Protocol in workflow.md)
 
 ## Phase 3: Final Polish & Cleanup
