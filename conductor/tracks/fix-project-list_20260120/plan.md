@@ -19,7 +19,7 @@
 - [x] Task: Run existing tests to ensure no regressions.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Fix Implementation' (Protocol in workflow.md)
 
-## Phase 3: Final Polish & Cleanup
+## Phase 3: Final Polish & Cleanup [checkpoint: 7ab67a5]
 - [x] Task: Refactor `plugin.js` if necessary for clarity.
 - [x] Task: Remove reproduction scripts if they are not converted to permanent tests.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Final Polish & Cleanup' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Final Polish & Cleanup' (Protocol in workflow.md)
