@@ -586,16 +586,17 @@ class MCPBridgePlugin {
             let projects = await PluginAPI.getAllProjects();
             
             // Supplement/verify with raw project data to ensure we don't miss any active projects
+            // (Standard API occasionally misses projects with 0 tasks or new projects)
             const projectState = await PluginAPI.loadSyncedData('PROJECT');
             if (projectState && projectState.entities) {
-               const allActiveProjects = Object.values(projectState.entities)
-                 .filter(p => !p.isArchived);
+               const rawProjects = Object.values(projectState.entities);
+               const activeRawProjects = rawProjects.filter(p => !p.isArchived);
                
-               // Use the one with more active projects if there's a discrepancy
+               // Use raw data if it contains more active projects than the API result
                const apiCount = Array.isArray(projects) ? projects.length : 0;
-               if (allActiveProjects.length > apiCount) {
-                 await this.log(`[DEBUG] getAllProjects discrepancy: API=${apiCount}, Raw=${allActiveProjects.length}. Using raw data.`);
-                 projects = allActiveProjects;
+               if (activeRawProjects.length > apiCount) {
+                 await this.log(`[DEBUG] getAllProjects discrepancy detected: API returns ${apiCount}, Raw State contains ${activeRawProjects.length}. Using raw data.`);
+                 projects = activeRawProjects;
                }
             }
             result = projects;
