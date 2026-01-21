@@ -328,6 +328,11 @@ class SuperProductivityMCPServer:
                     name="list_habits",
                     description="List all habits and simple counters",
                     inputSchema={"type": "object", "properties": {}}
+                ),
+                types.Tool(
+                    name="get_api_info",
+                    description="Get debug info about the available PluginAPI methods",
+                    inputSchema={"type": "object", "properties": {}}
                 )
             ]
 
@@ -371,6 +376,8 @@ class SuperProductivityMCPServer:
                     result = await self.update_habit(arguments)
                 elif name == "list_habits":
                     result = await self.list_habits(arguments)
+                elif name == "get_api_info":
+                    result = await self.get_api_info(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -630,6 +637,10 @@ class SuperProductivityMCPServer:
     async def list_habits(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """List all habits"""
         return await self.send_command("getAllSimpleCounters")
+
+    async def get_api_info(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get API debug info"""
+        return await self.send_command("getApiInfo")
 
     async def run(self):
         """Run the MCP server"""

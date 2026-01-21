@@ -1,0 +1,8 @@
+{
+  "track_id": "mcp-habit-management_20260120",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-01-20T00:00:00Z",
+  "updated_at": "2026-01-20T00:00:00Z",
+  "description": "Implement MCP tools for managing Habits (add, check, update, list) utilizing the new Plugin API."
+}

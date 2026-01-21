@@ -1,0 +1,8 @@
+{
+  "id": "restore-skills",
+  "name": "Restore Skills",
+  "owner": "connor",
+  "status": "active",
+  "created": "2026-01-18",
+  "description": "Restoring the activate_skill functionality and prompt registration."
+}

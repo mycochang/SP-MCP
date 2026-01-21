@@ -1,0 +1,12 @@
+[
+  {
+    "name": "security-review",
+    "description": "Perform a security review",
+    "content_file": "prompts/security-review.md"
+  },
+  {
+    "name": "bug-board-action-denied",
+    "description": "Handle denied actions",
+    "content_file": "prompts/bug-board-action-denied.md"
+  }
+]

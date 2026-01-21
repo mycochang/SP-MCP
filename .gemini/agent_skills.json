@@ -1,0 +1,10 @@
+{
+  "skills": {
+    "security-review": "prompts/security-review.md",
+    "security-report": "prompts/security_report.md",
+    "bug-board-action-denied": "prompts/bug-board-action-denied.md",
+    "feature-update-task-tags": "prompts/feature-update-task-tags.md",
+    "review-tag-upgrade": "prompts/review-tag-upgrade.md",
+    "urgent-revert": "prompts/URGENT_REVERT.md"
+  }
+}

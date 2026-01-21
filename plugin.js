@@ -143,7 +143,13 @@ class MCPBridgePlugin {
       this.isInitialized = true;
       await this.log('MCP Bridge Plugin initialized successfully!');
       
-      // Log success (skip notifications for now)
+      // DEBUG: Log PluginAPI keys
+      try {
+          const keys = Object.keys(PluginAPI);
+          await this.log(`[DEBUG] PluginAPI keys: ${keys.join(', ')}`);
+      } catch (e) {
+          await this.log(`[DEBUG] Failed to log keys: ${e.message}`);
+      }
       console.log('🔗 MCP Bridge connected! Ready for commands.');
       
       // Send initialization status to UI
@@ -684,24 +690,132 @@ class MCPBridgePlugin {
 
         // Habit operations
         case 'addHabit':
-          result = await PluginAPI.addHabit(command.data.title, command.data);
+          if (typeof PluginAPI.addHabit === 'function') {
+            result = await PluginAPI.addHabit(command.data.title, command.data);
+          } else if (typeof PluginAPI.addSimpleCounter === 'function') {
+             // Fallback: Use addSimpleCounter
+             const habitCfg = {
+                ...command.data,
+                isTrackStreaks: true,
+                type: 'ClickCounter'
+             };
+             result = await PluginAPI.addSimpleCounter(habitCfg);
+          } else {
+             // Fallback: Direct State Manipulation (God Mode)
+             const state = await PluginAPI.loadSyncedData('SIMPLE_COUNTER');
+             if (!state) throw new Error('Could not load SIMPLE_COUNTER state');
+             
+             const newId = 'HABIT_' + Date.now();
+             const newEntity = {
+                id: newId,
+                title: command.data.title,
+                isEnabled: true,
+                icon: command.data.icon || 'check_box',
+                type: 'ClickCounter',
+                countOnDay: {},
+                isOn: false,
+                isTrackStreaks: true,
+                streakMinValue: command.data.streakMinValue || 1,
+                streakWeekDays: {
+                    0: false, 1: true, 2: true, 3: true, 4: true, 5: true, 6: false
+                },
+                countdownDuration: 0,
+                ...command.data
+             };
+             
+             const newState = {
+                ...state,
+                ids: [...state.ids, newId],
+                entities: {
+                    ...state.entities,
+                    [newId]: newEntity
+                }
+             };
+             
+             await PluginAPI.persistDataSynced('SIMPLE_COUNTER', newState);
+             result = newId;
+          }
           break;
           
         case 'checkHabit':
-          result = await PluginAPI.checkHabit(command.habitId);
+          await this.log(`[DEBUG] checkHabit for ${command.habitId}`);
+          if (typeof PluginAPI.checkHabit === 'function') {
+             result = await PluginAPI.checkHabit(command.habitId);
+          } else if (typeof PluginAPI.setSimpleCounterToday === 'function') {
+             const counters = await PluginAPI.getAllSimpleCounters();
+             const counter = counters.find(c => c.id === command.habitId);
+             if (counter) {
+                 const today = new Date().toISOString().split('T')[0];
+                 const currentVal = counter.countOnDay[today] || 0;
+                 await this.log(`[DEBUG] Incrementing ${command.habitId} from ${currentVal} to ${currentVal + 1}`);
+                 result = await PluginAPI.setSimpleCounterToday(command.habitId, currentVal + 1);
+             } else {
+                 throw new Error(`Habit not found: ${command.habitId}`);
+             }
+          } else {
+             // Fallback: Redux Action
+             await PluginAPI.dispatchAction({
+                type: '[SimpleCounter] Increase SimpleCounter Today',
+                id: command.habitId,
+                increaseBy: 1
+             });
+             result = { success: true };
+          }
           break;
           
         case 'updateHabit':
-          result = await PluginAPI.updateHabit(command.habitId, command.updates);
+          if (typeof PluginAPI.updateHabit === 'function') {
+             result = await PluginAPI.updateHabit(command.habitId, command.updates);
+          } else if (typeof PluginAPI.updateSimpleCounter === 'function') {
+             result = await PluginAPI.updateSimpleCounter(command.habitId, command.updates);
+          } else {
+             // Fallback: Redux Action
+             await PluginAPI.dispatchAction({
+                type: '[SimpleCounter] Update SimpleCounter',
+                simpleCounter: {
+                    id: command.habitId,
+                    changes: command.updates
+                }
+             });
+             result = { success: true };
+          }
           break;
           
         case 'getAllSimpleCounters':
-          result = await PluginAPI.getAllSimpleCounters();
+          if (typeof PluginAPI.getAllSimpleCounters === 'function') {
+             result = await PluginAPI.getAllSimpleCounters();
+          } else {
+             // Fallback: loadSyncedData
+             const state = await PluginAPI.loadSyncedData('SIMPLE_COUNTER');
+             if (state && state.entities) {
+                 result = Object.values(state.entities);
+             } else {
+                 result = [];
+             }
+          }
           break;
 
         // Custom batch operations
         case 'batchOperation':
           result = await this.executeBatchOperation(command.operations);
+          break;
+          
+        case 'getApiInfo':
+          result = {
+            keys: Object.keys(PluginAPI),
+            version: PluginAPI.version || 'unknown'
+          };
+          break;
+          
+        case 'evalJS':
+          try {
+            // DANGER: Only for debugging. 
+            // We use an async function to allow 'await' in the code.
+            const evalFn = new Function('PluginAPI', 'command', `return (async () => { ${command.code} })()`);
+            result = await evalFn(PluginAPI, command);
+          } catch (e) {
+            result = { error: e.message };
+          }
           break;
           
         default:
