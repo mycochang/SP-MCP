@@ -1,0 +1,21 @@
+[project]
+name = "super-productivity-mcp"
+version = "0.1.0"
+description = "MCP Server for Super Productivity"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mcp>=1.25.0",
+    "python-dotenv>=1.2.1",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.9.0",
+    "mypy>=1.14.0",
+    "types-python-dateutil",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

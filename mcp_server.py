@@ -15,6 +15,8 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
+SERVER_VERSION = "1.0.0"
+
 
 class SuperProductivityMCPServer:
     def __init__(self):
@@ -25,13 +27,9 @@ class SuperProductivityMCPServer:
 
     def setup_directories(self):
         if os.name == "nt":  # Windows
-            data_dir = os.environ.get(
-                "APPDATA", os.path.expanduser("~/AppData/Roaming")
-            )
+            data_dir = os.environ.get("APPDATA", os.path.expanduser("~/AppData/Roaming"))
         else:  # Linux/Mac
-            data_dir = os.environ.get(
-                "XDG_DATA_HOME", os.path.expanduser("~/.local/share")
-            )
+            data_dir = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
 
         self.base_dir = Path(data_dir) / "super-productivity-mcp"
         self.command_dir = self.base_dir / "plugin_commands"
@@ -240,6 +238,49 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
+                    name="get_boards",
+                    description="Get all Kanban boards and their configurations",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="update_board",
+                    description="Update an existing board configuration",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "board_id": {
+                                "type": "string",
+                                "description": "Board ID to update",
+                            },
+                            "title": {"type": "string", "description": "New board title"},
+                            "cols": {
+                                "type": "integer",
+                                "description": "New number of columns",
+                            },
+                            "panels": {
+                                "type": "array",
+                                "description": "New list of panel configurations",
+                                "items": {"type": "object"},
+                            },
+                        },
+                        "required": ["board_id"],
+                    },
+                ),
+                types.Tool(
+                    name="delete_board",
+                    description="Delete a board",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "board_id": {
+                                "type": "string",
+                                "description": "Board ID to delete",
+                            }
+                        },
+                        "required": ["board_id"],
+                    },
+                ),
+                types.Tool(
                     name="create_board",
                     description="Create a new Kanban board configuration",
                     inputSchema={
@@ -287,15 +328,19 @@ class SuperProductivityMCPServer:
             ]
 
         @self.server.call_tool()
-        async def handle_call_tool(
-            name: str, arguments: Dict[str, Any]
-        ) -> List[types.TextContent]:
+        async def handle_call_tool(name: str, arguments: Dict[str, Any]) -> List[types.TextContent]:
             """Handle tool calls"""
             try:
                 if name == "create_task":
                     result = await self.create_task(arguments)
                 elif name == "get_tasks":
                     result = await self.get_tasks(arguments)
+                elif name == "get_boards":
+                    result = await self.get_boards(arguments)
+                elif name == "update_board":
+                    result = await self.update_board(arguments)
+                elif name == "delete_board":
+                    result = await self.delete_board(arguments)
                 elif name == "update_task":
                     result = await self.update_task(arguments)
                 elif name == "complete_and_archive_task":
@@ -321,7 +366,7 @@ class SuperProductivityMCPServer:
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
-                return [types.TextContent(type="text", text=str(result))]
+                return [types.TextContent(type="text", text=json.dumps(result))]
 
             except Exception as e:
                 logging.error(f"Error in tool {name}: {str(e)}")
@@ -383,9 +428,7 @@ class SuperProductivityMCPServer:
         title_clean = re.sub(r"\s*\+\w+", "", title_clean).strip()
 
         # Extract scheduling syntax (format: @fri 4pm, @tomorrow, @2024-01-15, etc.)
-        schedule_matches = re.findall(
-            r"@(\w+(?:\s+\d+[ap]m)?)", title_clean, re.IGNORECASE
-        )
+        schedule_matches = re.findall(r"@(\w+(?:\s+\d+[ap]m)?)", title_clean, re.IGNORECASE)
         title_clean = re.sub(
             r"\s*@\w+(?:\s+\d+[ap]m)?", "", title_clean, flags=re.IGNORECASE
         ).strip()
@@ -412,38 +455,69 @@ class SuperProductivityMCPServer:
 
         return await self.send_command("addTask", data=task_data)
 
-    async def get_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def get_tasks(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tasks"""
-        return await self.send_command("getTasks")
+        include_done = arguments.get("include_done", True)
+
+        result = await self.send_command("getTasks")
+
+        if result.get("success"):
+            tasks = result.get("result", [])
+            if not include_done:
+                tasks = [t for t in tasks if not t.get("isDone", False)]
+            return {"success": True, "result": tasks}
+        else:
+            return result
+
+    async def get_boards(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        """Get all boards"""
+        return await self.send_command("getBoards")
+
+    async def update_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a board"""
+        board_id = args.get("board_id")
+        if not board_id:
+            return {"success": False, "error": "board_id is required"}
+
+        updates = {}
+        if "title" in args:
+            updates["title"] = args["title"]
+        if "cols" in args:
+            updates["cols"] = args["cols"]
+        if "panels" in args:
+            updates["panels"] = args["panels"]
+
+        return await self.send_command("updateBoard", boardId=board_id, data=updates)
+
+    async def delete_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Delete a board"""
+        board_id = args.get("board_id")
+        if not board_id:
+            return {"success": False, "error": "board_id is required"}
+        return await self.send_command("deleteBoard", boardId=board_id)
 
     async def update_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Update a task"""
+        """Update an existing task"""
         task_id = args.get("task_id")
         if not task_id:
             return {"success": False, "error": "task_id is required"}
 
-        updates = {}
-
-        # Handle title - Claude should have already converted natural language to SP syntax
+        # Prepare update data
+        update_data = {}
         if "title" in args:
-            updates["title"] = args["title"]
-
+            update_data["title"] = args["title"]
         if "notes" in args:
-            updates["notes"] = args["notes"]
+            update_data["notes"] = args["notes"]
         if "is_done" in args:
-            updates["isDone"] = args["is_done"]
-            if args["is_done"]:
-                updates["doneOn"] = asyncio.get_event_loop().time() * 1000
-            else:
-                updates["doneOn"] = None
+            update_data["isDone"] = args["is_done"]
         if "time_estimate" in args:
-            updates["timeEstimate"] = args["time_estimate"]
+            update_data["timeEstimate"] = args["time_estimate"]
         if "time_spent" in args:
-            updates["timeSpent"] = args["time_spent"]
+            update_data["timeSpent"] = args["time_spent"]
         if "tag_ids" in args:
-            updates["tagIds"] = args["tag_ids"]
+            update_data["tagIds"] = args["tag_ids"]
 
-        return await self.send_command("updateTask", taskId=task_id, data=updates)
+        return await self.send_command("updateTask", taskId=task_id, data=update_data)
 
     async def complete_and_archive_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Complete a task (mark as done) - true deletion is not supported"""

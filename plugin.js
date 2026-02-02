@@ -1,4 +1,5 @@
 // MCP Bridge Plugin for Super Productivity
+const PLUGIN_VERSION = "1.0.0";
 
 class MCPBridgePlugin {
   constructor() {
@@ -603,13 +604,86 @@ class MCPBridgePlugin {
           break;
 
         // Board Management (Added for MCP)
+        case 'getBoards':
+          try {
+            const boardsData = await PluginAPI.loadSyncedData('boards');
+            // console.log('Boards data loaded:', JSON.stringify(boardsData));
+            if (boardsData && boardsData.boardCfgs) {
+              result = boardsData.boardCfgs;
+            } else {
+              result = [];
+            }
+          } catch (e) {
+            console.error('Failed to get boards:', e);
+            result = { error: 'Failed to fetch boards: ' + e.message };
+          }
+          break;
+
         case "createBoard":
         case "addBoard":
-          await PluginAPI.dispatchAction({
-            type: "[Boards] Add Board",
-            board: command.data,
-          });
-          result = { success: true, message: "Board created" };
+          try {
+            const boardsData = await PluginAPI.loadSyncedData('boards') || { boardCfgs: [] };
+            if (!boardsData.boardCfgs) boardsData.boardCfgs = [];
+            
+            // Generate ID if not provided
+            const newBoard = {
+              id: command.data.id || 'BOARD_' + Date.now(),
+              ...command.data
+            };
+            
+            boardsData.boardCfgs.push(newBoard);
+            
+            await PluginAPI.persistDataSynced('boards', boardsData);
+            result = { success: true, message: "Board created", boardId: newBoard.id };
+          } catch (e) {
+            result = { success: false, error: 'Failed to create board: ' + e.message };
+          }
+          break;
+
+        case "updateBoard":
+          try {
+            const boardsData = await PluginAPI.loadSyncedData('boards');
+            if (!boardsData || !boardsData.boardCfgs) {
+              throw new Error('No boards found');
+            }
+            
+            const boardIndex = boardsData.boardCfgs.findIndex(b => b.id === command.boardId);
+            if (boardIndex === -1) {
+              throw new Error('Board not found');
+            }
+            
+            // Merge changes
+            boardsData.boardCfgs[boardIndex] = {
+              ...boardsData.boardCfgs[boardIndex],
+              ...command.data
+            };
+            
+            await PluginAPI.persistDataSynced('boards', boardsData);
+            result = { success: true, message: "Board updated" };
+          } catch (e) {
+            result = { success: false, error: 'Failed to update board: ' + e.message };
+          }
+          break;
+
+        case "deleteBoard":
+          try {
+            const boardsData = await PluginAPI.loadSyncedData('boards');
+            if (!boardsData || !boardsData.boardCfgs) {
+              throw new Error('No boards found');
+            }
+            
+            const initialLength = boardsData.boardCfgs.length;
+            boardsData.boardCfgs = boardsData.boardCfgs.filter(b => b.id !== command.boardId);
+            
+            if (boardsData.boardCfgs.length === initialLength) {
+              throw new Error('Board not found');
+            }
+            
+            await PluginAPI.persistDataSynced('boards', boardsData);
+            result = { success: true, message: "Board deleted" };
+          } catch (e) {
+            result = { success: false, error: 'Failed to delete board: ' + e.message };
+          }
           break;
 
         // UI operations
@@ -648,6 +722,47 @@ class MCPBridgePlugin {
         case 'loadSyncedData':
           result = await PluginAPI.loadSyncedData(command.key);
           break;
+
+        case 'probeAPI':
+          const props = [];
+          let obj = PluginAPI;
+          while (obj) {
+            props.push(...Object.getOwnPropertyNames(obj));
+            obj = Object.getPrototypeOf(obj);
+          }
+          result = { 
+            properties: [...new Set(props)],
+            type: typeof PluginAPI,
+            version: PLUGIN_VERSION
+          };
+          break;
+
+        case 'dumpState':
+          const keys = ['boards', 'project', 'projects', 'task', 'config', 'globalConfig'];
+          const dump = {};
+          
+          for (const key of keys) {
+            try {
+              dump[key] = await PluginAPI.loadSyncedData(key);
+            } catch (e) {
+              dump[key] = `Error: ${e.message}`;
+            }
+          }
+          result = dump;
+          break;
+
+        case 'inspectData':
+           try {
+             const data = await PluginAPI.loadSyncedData(command.key);
+             result = { 
+               found: !!data, 
+               type: typeof data,
+               data: data 
+             };
+           } catch (e) {
+             result = { error: e.message };
+           }
+           break;
 
         // Custom batch operations
         case 'batchOperation':
