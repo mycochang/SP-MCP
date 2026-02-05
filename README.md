@@ -4,17 +4,15 @@ Bridge between the amazing [Super Productivity](https://github.com/johannesjo/su
 
 This MCP server and plugin allow AI agents (via Claude Desktop, OpenCode, etc.) to directly interact with Super Productivity. Create tasks, manage projects, organize tags, and query your workload using natural language.
 
+> **Disclaimer:** This extension has been primarily developed and tested with **OpenCode CLI** and **Gemini CLI**. While it includes standard configuration for Claude Desktop, it has not been verified on that platform.
+>
 > **Note:** Always backup your Super Productivity data before using this extension.
-
-## Demo
-
-https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
 
 ## Run it yourself
 
 ### Prerequisites
 - **Super Productivity** (Tested on [v17.0.1](https://github.com/johannesjo/super-productivity/commit/a51b2c5))
-- **Python** (v3.10+)
+- **Python** (Developed on **v3.13.11**)
 - **uv** (Recommended) or `pip`
 
 ### 1. Clone the Repository
@@ -37,7 +35,7 @@ pip install -r requirements.txt
 
 ### 3. Connect to your AI Client
 
-#### Option A: OpenCode CLI (Recommended)
+#### Option A: OpenCode CLI (Tested & Recommended)
 Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` object:
 
 ```json
@@ -54,7 +52,7 @@ Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` ob
 }
 ```
 
-#### Option B: Claude Desktop
+#### Option B: Claude Desktop (Untested)
 Edit your config file:
 - **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 - **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
@@ -81,6 +79,10 @@ Add this inside the `mcpServers` object:
 3. Click **Upload Plugin**.
 4. Select the `plugin.js` file from the `SP-MCP` directory (or `plugin.zip` if provided).
 5. **Restart** Super Productivity.
+
+## Demo
+
+https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
 
 ## Usage
 
