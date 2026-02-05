@@ -1,101 +1,81 @@
 # SP-MCP
 
-Bridge between the amazing [Super Productivity](https://github.com/johannesjo/super-productivity/) app and MCP (Model Context Protocol) servers for Claude Desktop integration.
+Bridge between the amazing [Super Productivity](https://github.com/johannesjo/super-productivity/) app and MCP (Model Context Protocol) servers.
 
-This MCP and plugin allows Claude Desktop to directly interact with Super Productivity through the MCP protocol. Create update,tasks, manage projects and tags, and get information from Super Productivity.
+This MCP server and plugin allow AI agents (via Claude Desktop, OpenCode, etc.) to directly interact with Super Productivity. Create tasks, manage projects, organize tags, and query your workload using natural language.
 
-Make sure to backup your Super Productivity before using in case of data loss. I've provided a plugin.zip for convenience but feel free to make your own from the files.
-
-(Can't delete tasks right now (but it can mark them as done))
+> **Note:** Always backup your Super Productivity data before using this extension.
 
 ## Demo
 
 https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
 
+## Run it yourself
 
-## Requirements
+### Prerequisites
+- **Super Productivity** (v14.0.0+)
+- **Python** (v3.10+)
+- **uv** (Recommended) or `pip`
 
-- Super Productivity 14.0.0 or higher
-- Claude Desktop
-- Python 3.8 or higher
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/SP-MCP.git
+cd SP-MCP
+```
 
-## Installation
+### 2. Install Dependencies
 
-### Automatic Setup
+**Using uv (Recommended):**
+```bash
+uv sync
+```
 
-**Windows:**
-1. Clone this repo
-2. Run `setup.bat`
-3. Follow the prompts
+**Using pip:**
+```bash
+pip install -r requirements.txt
+```
 
-**Linux/Mac UNTESTED:**
-1. Clone this repo
-2. Run `chmod +x setup.sh && ./setup.sh`
-3. Follow the prompts
+### 3. Connect to your AI Client
 
-The setup scripts will preserve any existing MCP servers in your Claude Desktop configuration.
+#### Option A: OpenCode CLI (Recommended)
+Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` object:
 
-You'll still have to install the plugin.zip manually in Super Productivity in settings->plugins.
+```json
+"super-productivity": {
+  "enabled": true,
+  "type": "local",
+  "command": [
+    "uv",
+    "run",
+    "--directory",
+    "/absolute/path/to/SP-MCP",
+    "mcp_server.py"
+  ]
+}
+```
 
-Once that's done, restart claude (and Super Prod for good measure) and you should be able to access your files
+#### Option B: Claude Desktop
+Add the following to your `claude_desktop_config.json`:
 
-### Manual Setup
+```json
+"super-productivity": {
+  "command": "uv",
+  "args": [
+    "run",
+    "--directory",
+    "/absolute/path/to/SP-MCP",
+    "mcp_server.py"
+  ]
+}
+```
+*(Replace `/absolute/path/to/SP-MCP` with your actual path)*
 
-1. **Install Python dependencies:**
-   ```bash
-   pip install mcp
-   ```
-
-2. **Set up MCP server:**
-   Copy `mcp_server.py` to your data directory:
-   - Windows: `%APPDATA%\super-productivity-mcp\`
-   - Linux: `~/.local/share/super-productivity-mcp/`
-   - macOS: `~/Library/Application Support/super-productivity-mcp/`
-
-3. **Configure Claude Desktop:**
-   Edit Claude's config file and add to `mcpServers`:
-   ```json
-   "super-productivity": {
-     "command": "python3",
-     "args": ["/path/to/mcp_server.py"]
-   }
-   ```
-
-4. **Configure OpenCode CLI (Optional):**
-   If you use [OpenCode CLI](https://github.com/opencode-ai/cli), edit your config file (typically `~/.config/opencode/opencode.json`) and add to the `mcp` object:
-   
-   ```json
-   "super-productivity": {
-     "enabled": true,
-     "type": "local",
-     "command": [
-       "python3",
-       "/path/to/SP-MCP/mcp_server.py"
-     ]
-   }
-   ```
-   
-   Or if you use `uv` (Recommended):
-   ```json
-   "super-productivity": {
-     "enabled": true,
-     "type": "local",
-     "command": [
-       "uv",
-       "run",
-       "--directory",
-       "/path/to/SP-MCP",
-       "mcp_server.py"
-     ]
-   }
-   ```
-
-5. **Install the plugin:**
-   - Open Super Productivity → Settings → Plugins
-   - Click "Upload Plugin"
-   - Select `plugin.js`
-
-6. **Restart Claude Desktop**
+### 4. Install the Plugin
+1. Open **Super Productivity**.
+2. Go to **Settings** → **Plugins**.
+3. Click **Upload Plugin**.
+4. Select the `plugin.js` file from the `SP-MCP` directory (or `plugin.zip` if provided).
+5. **Restart** Super Productivity.
 
 ## Usage
 
@@ -118,30 +98,23 @@ Once that's done, restart claude (and Super Prod for good measure) and you shoul
 "Get all tags"
 ```
 
-## Dashboard
+## Features
 
-Access the SP-MCP dashboard from the menu. The dashboard shows:
-- Real-time statistics
-- Connection status
-- Activity logs
-- Settings (polling frequency: default 2 seconds)
-
-## Communication
-
-The plugin uses file-based communication through:
-- Windows: `%APPDATA%\super-productivity-mcp\`
-- Linux: `~/.local/share/super-productivity-mcp/`
-- macOS: `~/Library/Application Support/super-productivity-mcp/`
-
-Commands are exchanged through `plugin_commands/` and `plugin_responses/` directories.
+- **Task Management:** Create, update, complete, and query tasks.
+- **Organization:** Manage Projects and Tags.
+- **Natural Language:** Supports Super Productivity's syntax (e.g., `#tag`, `+project`, time estimates).
+- **Dashboard:** Real-time statistics and connection status (via plugin UI).
+- **File-Based Sync:** Uses local file watching for low-latency communication.
 
 ## Troubleshooting
 
 ### Plugin Not Loading
-- Check Super Productivity version (14.0.0+ required)
-- Verify plugin permissions include `nodeExecution`
+- Check Super Productivity version (14.0.0+ required).
+- Verify plugin permissions include `nodeExecution` (if prompted).
 
 ### Commands Not Working
-- Verify both plugin and MCP server are running
-- Check file permissions on communication directories
-- Check `mcp_server.log` in the data directory
+- Verify both the Plugin (in Super Productivity) and the MCP Server (in your AI client) are running.
+- Check file permissions on the communication directories:
+    - Linux: `~/.local/share/super-productivity-mcp/`
+    - macOS: `~/Library/Application Support/super-productivity-mcp/`
+    - Windows: `%APPDATA%\super-productivity-mcp\`
