@@ -39,6 +39,7 @@ pip install -r requirements.txt
 #### Option A: OpenCode CLI (Tested & Recommended)
 Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` object:
 
+**Using uv (Recommended):**
 ```json
 "super-productivity": {
   "enabled": true,
@@ -49,6 +50,18 @@ Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` ob
     "--directory",
     "/absolute/path/to/SP-MCP",
     "mcp_server.py"
+  ]
+}
+```
+
+**Using standard Python:**
+```json
+"super-productivity": {
+  "enabled": true,
+  "type": "local",
+  "command": [
+    "python3",
+    "/absolute/path/to/SP-MCP/mcp_server.py"
   ]
 }
 ```
