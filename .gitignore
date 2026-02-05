@@ -1,0 +1,10 @@
+temp_sp_src/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+plugin.zip
+conductor/
+sync_agent/*.json
+VERIFICATION_REPORT_*.md
