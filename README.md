@@ -55,7 +55,12 @@ Add the following to your `~/.config/opencode/opencode.json` inside the `mcp` ob
 ```
 
 #### Option B: Claude Desktop
-Add the following to your `claude_desktop_config.json`:
+Edit your config file:
+- **Mac:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
+
+Add this inside the `mcpServers` object:
 
 ```json
 "super-productivity": {
@@ -68,7 +73,7 @@ Add the following to your `claude_desktop_config.json`:
   ]
 }
 ```
-*(Replace `/absolute/path/to/SP-MCP` with your actual path)*
+*(Replace `/absolute/path/to/SP-MCP` with the output of `pwd` from Step 1)*
 
 ### 4. Install the Plugin
 1. Open **Super Productivity**.
