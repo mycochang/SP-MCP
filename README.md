@@ -61,12 +61,41 @@ Once that's done, restart claude (and Super Prod for good measure) and you shoul
    }
    ```
 
-4. **Install the plugin:**
+4. **Configure OpenCode CLI (Optional):**
+   If you use [OpenCode CLI](https://github.com/opencode-ai/cli), edit your config file (typically `~/.config/opencode/opencode.json`) and add to the `mcp` object:
+   
+   ```json
+   "super-productivity": {
+     "enabled": true,
+     "type": "local",
+     "command": [
+       "python3",
+       "/path/to/SP-MCP/mcp_server.py"
+     ]
+   }
+   ```
+   
+   Or if you use `uv` (Recommended):
+   ```json
+   "super-productivity": {
+     "enabled": true,
+     "type": "local",
+     "command": [
+       "uv",
+       "run",
+       "--directory",
+       "/path/to/SP-MCP",
+       "mcp_server.py"
+     ]
+   }
+   ```
+
+5. **Install the plugin:**
    - Open Super Productivity → Settings → Plugins
    - Click "Upload Plugin"
    - Select `plugin.js`
 
-5. **Restart Claude Desktop**
+6. **Restart Claude Desktop**
 
 ## Usage
 
