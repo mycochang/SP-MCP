@@ -32,6 +32,7 @@ uv sync
 ```bash
 pip install -r requirements.txt
 ```
+> Practice safe `requirements.txt`: don't forget a conda! 😉
 
 ### 3. Connect to your AI Client
 
