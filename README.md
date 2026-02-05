@@ -13,7 +13,7 @@ https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
 ## Run it yourself
 
 ### Prerequisites
-- **Super Productivity** (v14.0.0+)
+- **Super Productivity** (Tested on [v17.0.1](https://github.com/johannesjo/super-productivity/commit/a51b2c5))
 - **Python** (v3.10+)
 - **uv** (Recommended) or `pip`
 
