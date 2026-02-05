@@ -4,7 +4,6 @@ __pycache__/
 .venv/
 venv/
 .env
-plugin.zip
 conductor/
 sync_agent/*.json
 VERIFICATION_REPORT_*.md
