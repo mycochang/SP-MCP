@@ -84,3 +84,54 @@ This document defines standard workflows and skills for AI agents interacting wi
 1.  **Zero Context Overhead:** Subagents spawn fresh. This keeps them fast and focused.
 2.  **Explicit Context:** If the subagent needs to know the "Task Notes", the Main Agent must fetch and inject them.
 3.  **No "Ghost Writes":** Always ask for confirmation before creating or deleting data based on a subagent's logic.
+
+---
+
+## Skill: The Time-Boxed Arc
+
+**Goal:** Execute a complex user goal with strict time-boxing, ensuring the human explicitly "clocks in" to the task before the agent begins work. This prevents "Time Blindness" and "Scope Creep."
+
+**Tools Required:**
+- `create_task`
+- `create_subtask`
+- `update_task` (for scope updates and post-mortems)
+- `show_notification`
+
+**Procedure:**
+
+1.  **Scope & Estimate (The "Bid"):**
+    - **Trigger:** User provides a goal (e.g., "Refactor the login logic").
+    - **Action:** Analyze the request. Calculate a complexity estimate.
+    - **Rule:** **You must propose a Time Estimate (in minutes/hours) before creating any task.**
+
+2.  **The "Ritual" Setup:**
+    - Call `create_task`:
+        - `title`: The goal (e.g., "Refactor Login Logic").
+        - `time_estimate`: The calculated bid (converted to ms).
+        - `#tag`: Add `#AgentArc` or `#DeepWork` if available.
+    - Call `create_subtask`:
+        - `title`: **"▶️ CLICK START TIMER"** (Visual cue for the user).
+        - `parent_id`: The ID of the main task.
+    - **Wait State:** Inform the user: *"I have set up the task '[Task Name]' with a [Time] estimate. Please click the timer on that task in Super Productivity, then tell me 'Go'."*
+
+3.  **Scope Defense (During Execution):**
+    - **Trigger:** User adds a new request *during* the arc.
+    - **Check:** Does this new request fit within the *current* `time_estimate`?
+    - **If YES:** Proceed.
+    - **If NO:** Stop.
+        - **Refusal:** *"That is out of scope for our current [Time] session."*
+        - **Offer:** *"I can 1) Add 15m to the current task, or 2) Create a new 'Later' task."*
+
+4.  **The "Reflection" Loop (Post-Mortem):**
+    - **Trigger:** User signals completion ("We are done").
+    - **Action:**
+        - Call `get_tasks` to retrieve the *actual* `timeSpent`.
+        - Calculate Variance: `(timeSpent - timeEstimate) / timeEstimate`.
+    - **Artifact:** Update the **Task Notes** with a "Velocity Report":
+        ```markdown
+        ### Agent Reflection
+        - **Estimated:** 30m
+        - **Actual:** 45m
+        - **Variance:** +50%
+        - **Learning:** Underestimated complexity of [Specific Detail].
+        ```
