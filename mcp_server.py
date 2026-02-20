@@ -280,6 +280,16 @@ class SuperProductivityMCPServer:
                     description="Debug the communication directories and show their status",
                     inputSchema={"type": "object", "properties": {}},
                 ),
+                types.Tool(
+                    name="observe_context",
+                    description="Read-only tool to fetch the user's active context.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="get_workload_metrics",
+                    description="Read-only tool to fetch the user's workload metrics.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
             ]
 
         @self.server.call_tool()
@@ -312,6 +322,10 @@ class SuperProductivityMCPServer:
                     result = await self.show_notification(arguments)
                 elif name == "debug_directories":
                     result = await self.debug_directories(arguments)
+                elif name == "observe_context":
+                    result = await self.observe_context(arguments)
+                elif name == "get_workload_metrics":
+                    result = await self.get_workload_metrics(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -532,6 +546,14 @@ class SuperProductivityMCPServer:
                 "responses": self.response_dir.exists(),
             },
         }
+
+    async def observe_context(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch the user's active context."""
+        return await self.send_command("observeContext")
+
+    async def get_workload_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch the user's workload metrics."""
+        return await self.send_command("getWorkloadMetrics")
 
     async def run(self):
         """Run the MCP server"""
