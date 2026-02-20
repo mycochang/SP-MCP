@@ -1,0 +1,8 @@
+{
+  "track_id": "ooda_loop_20260220",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-20T00:00:00Z",
+  "updated_at": "2026-02-20T00:00:00Z",
+  "description": "Implement Context-Aware OODA Loop for SP-MCP. Refactor the Super Productivity MCP bridge to prioritize context-awareness and safe, atomic execution. This track introduces read-only tools for the AI to 'Observe' the user's active context and historical metrics, followed by strict, safe write tools (Atomic Batching and validated Counter updates) for the 'Act' phase. this is Counter extension to our plugin."
+}
