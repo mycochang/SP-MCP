@@ -11,9 +11,9 @@
 - [x] Task: Implement atomic batching for writes to ensure safe execution. [482feb6]
     - [x] Sub-task: Write Tests for atomic batch operations.
     - [x] Sub-task: Implement `atomic_batch` write tool.
-- [ ] Task: Implement validated Counter updates.
-    - [ ] Sub-task: Write Tests for Counter updates validation.
-    - [ ] Sub-task: Implement `update_counter` tool with strict validation checks.
+- [x] Task: Implement validated Counter updates. [325950e]
+    - [x] Sub-task: Write Tests for Counter updates validation.
+    - [x] Sub-task: Implement `update_counter` tool with strict validation checks.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Action Tools (Strict Safe Writes)' (Protocol in workflow.md)
 
 ## Phase 3: Integration & Context Injection
