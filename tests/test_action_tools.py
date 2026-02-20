@@ -32,29 +32,3 @@ async def test_update_counter():
         
         assert result['success'] is True
         mock_send.assert_called_once_with('updateCounter', counterId='focus_score', value=10)
-
-def test_inject_context_string():
-    server = SuperProductivityMCPServer()
-    base_notes = "User notes here."
-    context = {"agent_status": "waiting", "source": "slack"}
-    
-    new_notes = server._inject_context_string(base_notes, context)
-    assert base_notes in new_notes
-    assert "<!-- SP-MCP-CONTEXT: " in new_notes
-    assert '"agent_status": "waiting"' in new_notes
-
-def test_extract_context_string():
-    server = SuperProductivityMCPServer()
-    notes = 'User notes here.\n\n<!-- SP-MCP-CONTEXT: {"agent_status": "waiting", "source": "slack"} -->'
-    
-    context = server._extract_context_string(notes)
-    assert context is not None
-    assert context["agent_status"] == "waiting"
-    assert context["source"] == "slack"
-
-def test_extract_context_empty():
-    server = SuperProductivityMCPServer()
-    notes = 'User notes here with no context.'
-    
-    context = server._extract_context_string(notes)
-    assert context is None

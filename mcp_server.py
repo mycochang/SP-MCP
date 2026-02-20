@@ -326,18 +326,6 @@ class SuperProductivityMCPServer:
                         "required": ["counter_id", "value"]
                     },
                 ),
-                types.Tool(
-                    name="inject_context",
-                    description="Inject hidden JSON context into a task's notes for agent state tracking.",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_id": {"type": "string", "description": "The ID of the task"},
-                            "context_data": {"type": "object", "description": "JSON object to store invisibly in the task notes"}
-                        },
-                        "required": ["task_id", "context_data"]
-                    },
-                ),
             ]
 
         @self.server.call_tool()
@@ -378,8 +366,6 @@ class SuperProductivityMCPServer:
                     result = await self.atomic_batch(arguments)
                 elif name == "update_counter":
                     result = await self.update_counter(arguments)
-                elif name == "inject_context":
-                    result = await self.inject_context(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -456,30 +442,6 @@ class SuperProductivityMCPServer:
 
         return title_clean, tag_matches, project_matches, schedule_matches, time_matches
 
-    def _extract_context_string(self, notes: str) -> Optional[Dict[str, Any]]:
-        """Extract hidden JSON context from task notes."""
-        if not notes:
-            return None
-        match = re.search(r"<!-- SP-MCP-CONTEXT:\s*({.*?})\s*-->", notes, re.DOTALL)
-        if match:
-            try:
-                return json.loads(match.group(1))
-            except json.JSONDecodeError:
-                pass
-        return None
-
-    def _inject_context_string(self, notes: str, context: Dict[str, Any]) -> str:
-        """Inject or replace hidden JSON context in task notes."""
-        notes = notes or ""
-        context_str = f"<!-- SP-MCP-CONTEXT: {json.dumps(context)} -->"
-        
-        # Replace if exists
-        if re.search(r"<!-- SP-MCP-CONTEXT:\s*({.*?})\s*-->", notes, re.DOTALL):
-            return re.sub(r"<!-- SP-MCP-CONTEXT:\s*({.*?})\s*-->", context_str, notes, flags=re.DOTALL)
-        
-        # Append if not exists
-        return f"{notes.strip()}\n\n{context_str}".strip()
-
     async def create_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new task"""
         title = args.get("title", "")
@@ -498,17 +460,7 @@ class SuperProductivityMCPServer:
 
     async def get_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tasks"""
-        response = await self.send_command("getTasks")
-        
-        # Post-process to extract agent context
-        if response.get("success") and isinstance(response.get("result"), list):
-            for task in response["result"]:
-                if isinstance(task, dict) and "notes" in task:
-                    ctx = self._extract_context_string(task["notes"])
-                    if ctx:
-                        task["agent_context"] = ctx
-                        
-        return response
+        return await self.send_command("getTasks")
 
     async def update_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Update a task"""
@@ -657,40 +609,6 @@ class SuperProductivityMCPServer:
             return {"success": False, "error": "Value must be an integer"}
             
         return await self.send_command("updateCounter", counterId=counter_id, value=value)
-
-    async def inject_context(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Inject hidden context into a task's notes."""
-        task_id = args.get("task_id")
-        context_data = args.get("context_data", {})
-        
-        if not task_id:
-            return {"success": False, "error": "task_id is required"}
-
-        # Get existing task to preserve notes
-        response = await self.get_tasks({})
-        if not response.get("success"):
-            return response
-            
-        # We need to dig into the plugin response structure which varies based on plugin.js
-        # Typically it's in response['result'] or similar. We'll send a specific 'updateTask' 
-        # command to the plugin which will handle the read-modify-write if needed.
-        # Wait, the safest way is to fetch the current task notes first, but we can't easily 
-        # do a single read-write without a dedicated plugin command. 
-        # Let's add a robust implementation that fetches tasks, finds the target, and updates it.
-        
-        tasks_list = []
-        if isinstance(response.get("result"), list):
-            tasks_list = response["result"]
-        elif isinstance(response.get("result"), dict) and "tasks" in response["result"]:
-            tasks_list = response["result"]["tasks"] # Handle getWorkloadMetrics style wrapped responses if needed
-
-        target_task = next((t for t in tasks_list if isinstance(t, dict) and t.get("id") == task_id), None)
-        if not target_task:
-             return {"success": False, "error": f"Task {task_id} not found."}
-             
-        new_notes = self._inject_context_string(target_task.get("notes", ""), context_data)
-        
-        return await self.send_command("updateTask", taskId=task_id, data={"notes": new_notes})
 
     async def run(self):
         """Run the MCP server"""
