@@ -21,3 +21,14 @@ async def test_atomic_batch():
         assert result['success'] is True
         assert len(result['results']) == 2
         mock_send.assert_called_once_with('batchOperation', operations=operations)
+
+@pytest.mark.asyncio
+async def test_update_counter():
+    server = SuperProductivityMCPServer()
+    with patch.object(server, 'send_command', new_callable=AsyncMock) as mock_send:
+        mock_send.return_value = {"success": True}
+        
+        result = await server.update_counter({"counter_id": "focus_score", "value": 10})
+        
+        assert result['success'] is True
+        mock_send.assert_called_once_with('updateCounter', counterId='focus_score', value=10)

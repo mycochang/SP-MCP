@@ -314,6 +314,18 @@ class SuperProductivityMCPServer:
                         "required": ["operations"]
                     },
                 ),
+                types.Tool(
+                    name="update_counter",
+                    description="Update a plugin counter with strict validation.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "counter_id": {"type": "string", "description": "ID of the counter to update"},
+                            "value": {"type": "integer", "description": "New value for the counter"}
+                        },
+                        "required": ["counter_id", "value"]
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -352,6 +364,8 @@ class SuperProductivityMCPServer:
                     result = await self.get_workload_metrics(arguments)
                 elif name == "atomic_batch":
                     result = await self.atomic_batch(arguments)
+                elif name == "update_counter":
+                    result = await self.update_counter(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -585,6 +599,16 @@ class SuperProductivityMCPServer:
         """Execute multiple write operations safely in a single batch."""
         operations = args.get("operations", [])
         return await self.send_command("batchOperation", operations=operations)
+
+    async def update_counter(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a plugin counter with strict validation."""
+        counter_id = args.get("counter_id")
+        value = args.get("value")
+        
+        if not isinstance(value, int):
+            return {"success": False, "error": "Value must be an integer"}
+            
+        return await self.send_command("updateCounter", counterId=counter_id, value=value)
 
     async def run(self):
         """Run the MCP server"""

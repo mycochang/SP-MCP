@@ -26,6 +26,11 @@ class MCPBridgePlugin {
       errors: 0,
       startTime: Date.now()
     };
+
+    // Plugin State (e.g. for Counter extension)
+    this.state = {
+      counters: {}
+    };
   }
 
   async loadConfig() {
@@ -672,6 +677,64 @@ class MCPBridgePlugin {
         case 'openDialog':
           result = await PluginAPI.openDialog(command.dialogConfig);
           break;
+
+        case 'observeContext': {
+          const activeTasks = await PluginAPI.getCurrentContextTasks();
+          const allProjects = await PluginAPI.getAllProjects();
+          const allTags = await PluginAPI.getAllTags();
+          result = {
+            activeTasks: activeTasks,
+            projects: allProjects,
+            tags: allTags,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'getWorkloadMetrics': {
+          const tasks = await PluginAPI.getTasks();
+          const archived = await PluginAPI.getArchivedTasks();
+          
+          const today = new Date().setHours(0, 0, 0, 0);
+          const completedToday = tasks.filter(t => t.isDone && t.doneOn >= today).length;
+          const pendingTasks = tasks.filter(t => !t.isDone).length;
+          
+          let totalEstimated = 0;
+          let totalSpent = 0;
+          tasks.forEach(t => {
+            totalEstimated += (t.timeEstimate || 0);
+            totalSpent += (t.timeSpent || 0);
+          });
+
+          result = {
+            totalTasks: tasks.length,
+            pendingTasks: pendingTasks,
+            completedToday: completedToday,
+            archivedTasks: archived.length,
+            totalTimeEstimatedMs: totalEstimated,
+            totalTimeSpentMs: totalSpent,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'updateCounter': {
+          const { counterId, value } = command;
+          if (!counterId) throw new Error('counterId is required');
+          
+          this.state.counters[counterId] = value;
+          
+          // Optionally persist this to SP synced data
+          await PluginAPI.persistDataSynced('MCP_COUNTERS', this.state.counters);
+          
+          result = {
+            success: true,
+            counterId: counterId,
+            newValue: value,
+            timestamp: Date.now()
+          };
+          break;
+        }
 
         // Data persistence
         case 'persistDataSynced':
