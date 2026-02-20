@@ -1,10 +1,10 @@
 # Implementation Plan: Context-Aware OODA Loop for SP-MCP
 
 ## Phase 1: Observation Tools (Read-Only)
-- [ ] Task: Set up read-only tools to fetch the user's active context and workload metrics.
-    - [ ] Sub-task: Write Tests for fetching the active task and metrics.
-    - [ ] Sub-task: Implement `observe_context` read-only tool in the MCP server.
-    - [ ] Sub-task: Implement `get_workload_metrics` read-only tool.
+- [x] Task: Set up read-only tools to fetch the user's active context and workload metrics. [b152d8b]
+    - [x] Sub-task: Write Tests for fetching the active task and metrics.
+    - [x] Sub-task: Implement `observe_context` read-only tool in the MCP server.
+    - [x] Sub-task: Implement `get_workload_metrics` read-only tool.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Observation Tools (Read-Only)' (Protocol in workflow.md)
 
 ## Phase 2: Action Tools (Strict Safe Writes)
