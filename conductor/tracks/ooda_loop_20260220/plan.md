@@ -14,10 +14,10 @@
 - [x] Task: Implement validated Counter updates. [325950e]
     - [x] Sub-task: Write Tests for Counter updates validation.
     - [x] Sub-task: Implement `update_counter` tool with strict validation checks.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Action Tools (Strict Safe Writes)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Action Tools (Strict Safe Writes)' (Protocol in workflow.md) [checkpoint: ab15ae8]
 
 ## Phase 3: Integration & Context Injection
-- [ ] Task: Integrate hidden context injection for AI tasks.
+- [~] Task: Integrate hidden context injection for AI tasks.
     - [ ] Sub-task: Write Tests for hidden context injection.
     - [ ] Sub-task: Implement context injection logic.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration & Context Injection' (Protocol in workflow.md)
