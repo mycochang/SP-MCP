@@ -17,7 +17,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Action Tools (Strict Safe Writes)' (Protocol in workflow.md) [checkpoint: ab15ae8]
 
 ## Phase 3: Integration & Context Injection
-- [~] Task: Integrate hidden context injection for AI tasks.
-    - [ ] Sub-task: Write Tests for hidden context injection.
-    - [ ] Sub-task: Implement context injection logic.
+- [x] Task: Integrate hidden context injection for AI tasks. [587009e]
+    - [x] Sub-task: Write Tests for hidden context injection.
+    - [x] Sub-task: Implement context injection logic.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Integration & Context Injection' (Protocol in workflow.md)
