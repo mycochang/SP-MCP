@@ -290,6 +290,30 @@ class SuperProductivityMCPServer:
                     description="Read-only tool to fetch the user's workload metrics.",
                     inputSchema={"type": "object", "properties": {}},
                 ),
+                types.Tool(
+                    name="atomic_batch",
+                    description="Execute multiple write operations safely in a single batch.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "operations": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "action": {"type": "string", "description": "Action to perform (e.g., addTask, updateTask)"},
+                                        "data": {"type": "object", "description": "Data for the action"},
+                                        "taskId": {"type": "string", "description": "Task ID if required"},
+                                        "projectId": {"type": "string", "description": "Project ID if required"},
+                                        "tagId": {"type": "string", "description": "Tag ID if required"}
+                                    },
+                                    "required": ["action"]
+                                }
+                            }
+                        },
+                        "required": ["operations"]
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -326,6 +350,8 @@ class SuperProductivityMCPServer:
                     result = await self.observe_context(arguments)
                 elif name == "get_workload_metrics":
                     result = await self.get_workload_metrics(arguments)
+                elif name == "atomic_batch":
+                    result = await self.atomic_batch(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
@@ -554,6 +580,11 @@ class SuperProductivityMCPServer:
     async def get_workload_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Read-only tool to fetch the user's workload metrics."""
         return await self.send_command("getWorkloadMetrics")
+
+    async def atomic_batch(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute multiple write operations safely in a single batch."""
+        operations = args.get("operations", [])
+        return await self.send_command("batchOperation", operations=operations)
 
     async def run(self):
         """Run the MCP server"""
