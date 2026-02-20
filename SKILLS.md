@@ -135,3 +135,89 @@ This document defines standard workflows and skills for AI agents interacting wi
         - **Variance:** +50%
         - **Learning:** Underestimated complexity of [Specific Detail].
         ```
+
+## Skill: Fibonacci Inbox Triage
+
+**Goal:** Rapidly estimate and categorize vague inbox tasks using relative Fibonacci sizing, translating them into strict time estimates for Super Productivity without tag pollution. Maps mental models directly to agile point systems.
+
+**Tools Required:** `get_tasks`, `update_task`, `ask_user` (or interactive CLI prompts)
+
+**The Fibonacci Time Matrix (No Tags):**
+* **1 Point:** 15 minutes (900,000 ms) - Quick Win
+* **2 Points:** 30 minutes (1,800,000 ms) - Short Task
+* **3 Points:** 1 hour (3,600,000 ms) - Standard Task
+* **5 Points:** 2 hours (7,200,000 ms) - Deep Work
+* **8 Points:** 4 hours (14,400,000 ms) - Half Day
+* **13+ Points:** Epic (8+ hours / 28,800,000+ ms) - *Requires breakdown*
+
+**Procedure:**
+1. **Observe (The Inbox):** Call `get_tasks(include_done=false)`. Filter for tasks where `timeEstimate == 0` AND `parentId == null`.
+2. **Orient & Question:** Present the vague tasks to the user one by one or in a batch. Ask them to assign a Fibonacci point value (1, 2, 3, 5, 8, 13).
+3. **Act (The Translation):** 
+    * **If 1-8 Points:** Convert the points to milliseconds using the matrix above. Call `update_task` to set the `timeEstimate`. Do *not* add tags unless explicitly requested by the user. The time estimate itself is the single source of truth for task sizing.
+    * **If 13+ Points:** Warn the user that the task is too large to estimate accurately. Immediately propose breaking it down. Ask the user for 2-3 specific sub-steps, create them as subtasks using `create_task(parent_id=...)`, and ask for Fibonacci points for the new subtasks.
+
+---
+
+## Skill: Pavlovian Time Tracker Nudge
+
+**Goal:** Provide positive, philosophical reinforcement to encourage the user to build the habit of clicking the play button on their active tasks, preventing "dark" un-tracked time.
+
+**Tools Required:** `get_tasks` (to observe state), `show_notification` (to act)
+
+**Procedure:**
+1. **Observe:** Whenever the agent is engaged for a standard prompt, silently call `get_tasks(include_done=false)`.
+2. **Orient:** Identify the task the user is currently working on (e.g., the one they just asked you about, or the most recently created/updated active task). Check if its `timeSpent` is 0 or if there is an active session running (if the API exposes active status).
+3. **Act (The Nudge):** If the user is actively working with the agent but hasn't tracked time, use the `show_notification` tool to send an OS-level audio/visual ping.
+4. **The Message:** The notification MUST be positive, spiritual, or philosophical (e.g., Stoic, Taoist).
+   * **Example:** "Nature does not hurry, yet everything is accomplished. Don't forget to start your timer." - Lao Tzu
+   * **Example:** "The impediment to action advances action. Click play on your task." - Marcus Aurelius
+
+---
+
+## Skill: Weekly Productivity Audit (The "How did you know" Skill)
+
+**Goal:** Act as a data-driven mirror for the user. Analyze the raw task database to reveal hidden psychological patterns, estimation biases, and workflow bottlenecks.
+
+**Tools Required:** `get_tasks`, Python scripting (via `bash` or internal data analysis)
+
+**Procedure:**
+1. **Fetch:** Call `get_tasks(include_done=true)` to pull the entire task history.
+2. **Analyze (The Math):**
+   * Calculate the **Completion Rate**: `(Completed Tasks / Total Tasks) * 100`.
+   * Calculate the **Estimation Accuracy**: For tasks where `timeEstimate > 0` AND `timeSpent > 0`, calculate the average ratio `(timeSpent / timeEstimate)`. *Identify if the user overestimates or underestimates.*
+   * Calculate the **Clarity Premium**: Compare the completion rate of tasks with non-empty `notes` vs empty `notes`.
+   * Calculate the **Procrastination Window**: Find the average age of incomplete tasks (`current_time - created_time`).
+3. **Synthesize & Report:** Present the findings to the user as a "Psychological Profile". Focus on actionable insights:
+   * *Did they overestimate?* Tell them they have more free time than they think.
+   * *Are old tasks rotting?* Suggest a backlog purge.
+   * *Do notes help?* Reinforce the habit of writing 1-sentence descriptions before starting work.
+
+---
+
+## [Gemini-Only] Skill: Inbox Triage & Staking (The OODA Pipeline)
+
+**Goal:** Transform vague phone-dumps into actionable, frictionless tasks to prevent the 14-Day Decay.
+
+**Tools Required:**
+- `get_workload_metrics`
+- `get_tasks`
+- `get_tags`
+- `update_task`
+
+**Procedure:**
+
+1.  **Observe (The Inbox):**
+    - Call `get_workload_metrics()`. If `pendingTasks > 30`, bias heavily towards moving items to the Backlog or a "Someday" tag during orientation.
+    - Call `get_tasks(include_done=false)`. Filter for tasks where `timeEstimate == 0` AND (`notes == null` or `notes == ""`). These are the "Vague Dumps".
+
+2.  **Orient (The Stake):**
+    - For each vague task, analyze the title and propose a "Stake" (Difficulty).
+    - **Prompt to User:** "I see '[Task Title]'. Is this a 15m #quick-win, a 60m deep-work session, or does it need Refinement?"
+
+3.  **Act (Refinement):**
+    - **Time Staking:** If the user provides an estimate (e.g., "15m"), call `update_task(task_id=..., time_estimate=X)`. 
+      - **CRITICAL:** Ensure X is converted to milliseconds (e.g., 15 minutes = 900,000 ms).
+    - **Clarity Premium:** If the user says it needs refinement, ask for 2-3 bullet points. Call `update_task(task_id=..., notes=bullets)` to secure the +17% Clarity Premium.
+    - **Decay Prevention:** If the task was created >14 days ago, suggest moving it to `#someday`.
+      - **To apply #someday:** Call `get_tags()` to find the ID for "Someday". Call `update_task(task_id=..., tag_ids=["<Someday_Tag_ID>"])`.

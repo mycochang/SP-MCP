@@ -6,4 +6,7 @@ venv/
 .env
 conductor/
 sync_agent/*.json
-VERIFICATION_REPORT_*.md\n# Auto-generated cheat sheets\nSuperProductivity_*CheatSheet*
+VERIFICATION_REPORT_*.md
+# Auto-generated cheat sheets
+SuperProductivity_*CheatSheet*
+.coverage
