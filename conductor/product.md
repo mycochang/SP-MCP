@@ -16,7 +16,8 @@ The SP-MCP bridge transforms Super Productivity from a standalone application in
 2. **Project/Tag Organization:** Full lifecycle management (creating, reading, assigning) for projects and custom tags.
 3. **Workload Analytics:** Providing detailed insights, real-time statistics, and historical metrics to the AI to understand workload distribution.
 4. **Executive Function Support:** Acting as a scheduling aid to help mitigate executive function overload by automating triage and prioritization.
-5. **ADHD Prioritization:** Leveraging AI to propose 'Smart Triage' and Quadrant Tags (Urgent/Now/Soon/Later) for rapid focus management.
+5. **Habit & Focus Tracking:** Integrating with native Simple Counters to manage daily habits, focus scores, and custom metrics (e.g., 'Coffee', 'Pomodoros').
+6. **ADHD Prioritization:** Leveraging AI to propose 'Smart Triage' and Quadrant Tags (Urgent/Now/Soon/Later) for rapid focus management.
 
 ## 4. Operational Philosophy
 The server must prioritize context-awareness. It should provide read-only tools for the AI to "Observe" the user's state, followed by strict, safe write tools to "Act." This ensures safe, atomic execution of tasks without accidentally corrupting the user's local Super Productivity data.
