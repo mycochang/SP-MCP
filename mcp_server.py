@@ -593,8 +593,8 @@ class SuperProductivityMCPServer:
         }
 
     async def observe_context(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Read-only tool to fetch the user's active context."""
-        return await self.send_command("observeContext")
+        """Read-only tool to fetch the user's currently active tasks and view context."""
+        return await self.send_command("getCurrentContextTasks")
 
     async def get_workload_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Read-only tool to fetch the user's workload metrics."""
