@@ -98,6 +98,14 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
+                    name="get_archived_tasks",
+                    description="Get all historically archived tasks from Super Productivity to analyze past performance and metrics.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {}
+                    },
+                ),
+                types.Tool(
                     name="update_task",
                     description="Update an existing task. When users provide natural language with time/date references, convert them to Super Productivity syntax in the title field.",
                     inputSchema={
@@ -341,6 +349,8 @@ class SuperProductivityMCPServer:
                     result = await self.create_task(arguments)
                 elif name == "get_tasks":
                     result = await self.get_tasks(arguments)
+                elif name == "get_archived_tasks":
+                    result = await self.get_archived_tasks(arguments)
                 elif name == "update_task":
                     result = await self.update_task(arguments)
                 elif name == "complete_and_archive_task":
@@ -466,6 +476,10 @@ class SuperProductivityMCPServer:
     async def get_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tasks"""
         return await self.send_command("getTasks")
+
+    async def get_archived_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get all archived tasks"""
+        return await self.send_command("getArchivedTasks")
 
     async def update_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Update a task"""
