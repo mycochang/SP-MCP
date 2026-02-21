@@ -333,6 +333,17 @@ class SuperProductivityMCPServer:
                     inputSchema={"type": "object", "properties": {}},
                 ),
                 types.Tool(
+                    name="open_dialog",
+                    description="Show an interactive native dialog modal in the Super Productivity UI.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "htmlContent": {"type": "string", "description": "HTML content for the modal body"}
+                        },
+                        "required": ["htmlContent"]
+                    },
+                ),
+                types.Tool(
                     name="update_counter",
                     description="Update a native simple counter with strict validation.",
                     inputSchema={
@@ -388,6 +399,8 @@ class SuperProductivityMCPServer:
                     result = await self.atomic_batch(arguments)
                 elif name == "get_productivity_audit":
                     result = await self.get_productivity_audit(arguments)
+                elif name == "open_dialog":
+                    result = await self.open_dialog(arguments)
                 elif name == "update_counter":
                     result = await self.update_counter(arguments)
                 else:
@@ -674,6 +687,17 @@ class SuperProductivityMCPServer:
         report = f"Productivity Audit:\n- Completion Rate: {comp_rate:.1f}%\n- Clarity Premium: {(notes_comp_rate - no_notes_comp_rate):.1f}% (Notes {notes_comp_rate:.1f}% vs No Notes {no_notes_comp_rate:.1f}%)\n- Procrastination Window: {avg_age:.1f} days average age of incomplete tasks\n- Estimation Accuracy: {avg_ratio:.2f} (Time Spent / Estimated)\n- Sample Size: {len(tasks)} total tasks ({len(estimated)} with both estimates and spent time)"
         
         return {"success": True, "report": report}
+
+    async def open_dialog(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Show a native modal dialog"""
+        content = args.get("htmlContent")
+        if not content:
+            return {"success": False, "error": "htmlContent is required"}
+            
+        dialog_cfg = {
+            "htmlContent": content
+        }
+        return await self.send_command("openDialog", dialogConfig=dialog_cfg)
 
     async def update_counter(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Update a plugin counter with strict validation."""
