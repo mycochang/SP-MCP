@@ -26,11 +26,6 @@ class MCPBridgePlugin {
       errors: 0,
       startTime: Date.now()
     };
-
-    // Plugin State (e.g. for Counter extension)
-    this.state = {
-      counters: {}
-    };
   }
 
   async loadConfig() {
@@ -721,16 +716,24 @@ class MCPBridgePlugin {
         case 'updateCounter': {
           const { counterId, value } = command;
           if (!counterId) throw new Error('counterId is required');
+          if (typeof value !== 'number') throw new Error('value must be a number');
           
-          this.state.counters[counterId] = value;
-          
-          // Optionally persist this to SP synced data
-          await PluginAPI.persistDataSynced('MCP_COUNTERS', this.state.counters);
+          await PluginAPI.setCounter(counterId, value);
           
           result = {
             success: true,
             counterId: counterId,
             newValue: value,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'getCounters': {
+          const counters = await PluginAPI.getAllCounters();
+          result = {
+            success: true,
+            counters: counters,
             timestamp: Date.now()
           };
           break;
