@@ -11,3 +11,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 - [x] **Track: Upgrade to Native Atomic Batching API**
   *Link: [./tracks/atomic_batch_20260220/](./tracks/atomic_batch_20260220/)*
+
+---
+
+- [ ] **Track: Implement Native SimpleCounters API**
+  *Link: [./tracks/simple_counters_20260220/](./tracks/simple_counters_20260220/)*

@@ -1,0 +1,8 @@
+{
+  "track_id": "simple_counters_20260220",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-20T20:30:00Z",
+  "updated_at": "2026-02-20T20:30:00Z",
+  "description": "Implement Native SimpleCounters API"
+}
