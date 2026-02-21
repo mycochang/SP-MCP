@@ -1,0 +1,19 @@
+--- plugin.js	2026-02-20 18:33:00.000000000 +0100
++++ plugin_new.js	2026-02-21 18:00:00.000000000 +0100
+@@ -685,7 +685,15 @@
+ 
+         // Custom batch operations
+         case 'batchOperation':
+-          result = await this.executeBatchOperation(command.operations);
++          if (PluginAPI.batchUpdateForProject) {
++            if (!command.projectId) {
++                throw new Error("batchOperation requires a projectId when using the native API.");
++            }
++            result = await PluginAPI.batchUpdateForProject({ projectId: command.projectId, operations: command.operations });
++          } else {
++            // Fallback for older versions of SP
++            result = await this.executeBatchOperation(command.operations);
++          }
+           break;
+           
+         default:

@@ -747,7 +747,15 @@ class MCPBridgePlugin {
 
         // Custom batch operations
         case 'batchOperation':
-          result = await this.executeBatchOperation(command.operations);
+          if (PluginAPI.batchUpdateForProject) {
+            if (!command.projectId) {
+                throw new Error("batchOperation requires a projectId when using the native API.");
+            }
+            result = await PluginAPI.batchUpdateForProject({ projectId: command.projectId, operations: command.operations });
+          } else {
+            // Fallback for older versions of SP
+            result = await this.executeBatchOperation(command.operations);
+          }
           break;
           
         default:

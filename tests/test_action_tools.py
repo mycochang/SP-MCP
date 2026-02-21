@@ -9,18 +9,17 @@ from unittest.mock import AsyncMock, patch
 async def test_atomic_batch():
     server = SuperProductivityMCPServer()
     with patch.object(server, 'send_command', new_callable=AsyncMock) as mock_send:
-        mock_send.return_value = {"success": True, "results": [{"success": True}, {"success": True}]}
+        mock_send.return_value = {"success": True, "createdTaskIds": {"temp1": "123", "temp2": "456"}}
         
         operations = [
-            {"action": "addTask", "data": {"title": "Task 1"}},
-            {"action": "updateTask", "taskId": "123", "data": {"title": "Updated Task"}}
+            {"type": "create", "tempId": "temp1", "data": {"title": "Parent Task"}},
+            {"type": "create", "tempId": "temp2", "data": {"title": "Subtask", "parentId": "temp1"}}
         ]
         
-        result = await server.atomic_batch({"operations": operations})
+        result = await server.atomic_batch({"project_id": "test_proj", "operations": operations})
         
         assert result['success'] is True
-        assert len(result['results']) == 2
-        mock_send.assert_called_once_with('batchOperation', operations=operations)
+        mock_send.assert_called_once_with('batchOperation', projectId='test_proj', operations=operations)
 
 @pytest.mark.asyncio
 async def test_update_counter():

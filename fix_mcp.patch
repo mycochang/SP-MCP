@@ -1,0 +1,53 @@
+--- mcp_server.py	2026-02-21 18:00:00.000000000 +0100
++++ mcp_server_new.py	2026-02-21 18:05:00.000000000 +0100
+@@ -298,12 +298,16 @@
+                 types.Tool(
+                     name="atomic_batch",
+-                    description="Execute multiple write operations safely in a single batch.",
++                    description="Execute multiple write operations safely in a single batch using the native SP PluginAPI.batchUpdateForProject. This allows creating parent and child tasks simultaneously using tempIds.",
+                     inputSchema={
+                         "type": "object",
+                         "properties": {
++                            "project_id": {
++                                "type": "string", 
++                                "description": "The Super Productivity Project ID to apply this batch to. REQUIRED."
++                            },
+                             "operations": {
+                                 "type": "array",
+                                 "items": {
+                                     "type": "object",
+                                     "properties": {
+-                                        "action": {"type": "string", "description": "Action to perform (e.g., addTask, updateTask)"},
+-                                        "data": {"type": "object", "description": "Data for the action"},
+-                                        "taskId": {"type": "string", "description": "Task ID if required"},
+-                                        "projectId": {"type": "string", "description": "Project ID if required"},
+-                                        "tagId": {"type": "string", "description": "Tag ID if required"}
++                                        "type": {"type": "string", "enum": ["create", "update", "delete", "reorder"], "description": "Action to perform"},
++                                        "tempId": {"type": "string", "description": "Temporary ID for create operations to allow linking subtasks"},
++                                        "taskId": {"type": "string", "description": "Existing task ID for update, delete, or reorder"},
++                                        "data": {"type": "object", "description": "Data for create operations (title, notes, parentId, timeEstimate)"},
++                                        "updates": {"type": "object", "description": "Data for update operations (title, notes, isDone, timeEstimate)"},
++                                        "taskIds": {"type": "array", "items": {"type": "string"}, "description": "Array of task IDs for reorder operations"}
+                                     },
+-                                    "required": ["action"]
++                                    "required": ["type"]
+                                 }
+                             }
+                         },
+-                        "required": ["operations"]
++                        "required": ["project_id", "operations"]
+                     },
+                 ),
+@@ -620,8 +624,11 @@
+     async def atomic_batch(self, args: Dict[str, Any]) -> Dict[str, Any]:
+-        """Execute multiple write operations safely in a single batch."""
++        """Execute multiple write operations safely in a single batch using the native API."""
+         operations = args.get("operations", [])
+-        return await self.send_command("batchOperation", operations=operations)
++        project_id = args.get("project_id")
++        if not project_id:
++            return {"success": False, "error": "project_id is required for atomic_batch"}
++            
++        return await self.send_command("batchOperation", projectId=project_id, operations=operations)
+ 
+     async def update_counter(self, args: Dict[str, Any]) -> Dict[str, Any]:

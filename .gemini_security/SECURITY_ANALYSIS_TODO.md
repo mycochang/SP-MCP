@@ -1,0 +1,4 @@
+- [x] Define the audit scope.
+- [ ] SAST Recon on `mcp_server.py`
+- [ ] SAST Recon on `plugin.js`
+- [ ] Conduct the final review of all findings as per your **Minimizing False Positives** operating principle and generate the final report.
