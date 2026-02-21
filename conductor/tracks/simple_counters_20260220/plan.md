@@ -12,10 +12,10 @@
     - [x] Sub-task: Remove the fake JSON-based counter stub.
     - [x] Sub-task: Map `update_counter` requests to native `setCounter` or `incrementCounter` methods.
     - [x] Sub-task: Build and package the updated `plugin.zip`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Bridge Implementation (JavaScript)' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Bridge Implementation (JavaScript)' (Protocol in workflow.md) [checkpoint: e5dc342]
 
 ## Phase 3: Python Schema Updates
-- [ ] Task: Ensure `mcp_server.py` exposes correct types and schemas for LLM interaction.
+- [~] Task: Ensure `mcp_server.py` exposes correct types and schemas for LLM interaction.
     - [ ] Sub-task: Update `update_counter` tool definitions with documented `counter_id` mappings (e.g., 'daily-pushups').
     - [ ] Sub-task: Write Tests for the updated schema.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Python Schema Updates' (Protocol in workflow.md)
