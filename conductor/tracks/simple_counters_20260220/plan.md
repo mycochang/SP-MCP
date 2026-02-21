@@ -18,4 +18,4 @@
 - [x] Task: Ensure `mcp_server.py` exposes correct types and schemas for LLM interaction. [b395f1f]
     - [x] Sub-task: Update `update_counter` tool definitions with documented `counter_id` mappings (e.g., 'daily-pushups').
     - [x] Sub-task: Write Tests for the updated schema.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Python Schema Updates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Python Schema Updates' (Protocol in workflow.md) [checkpoint: 5c7ad50]
