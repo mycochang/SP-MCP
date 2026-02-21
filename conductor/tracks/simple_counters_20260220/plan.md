@@ -5,10 +5,10 @@
     - [x] Sub-task: Analyze `plugin-bridge.service.ts` for exposed `PluginAPI` counter methods.
     - [x] Sub-task: Analyze `simple-counter.model.ts` for expected data structures.
     - [x] Sub-task: Investigate UI rendering logic for top-bar simple counters.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Upstream Analysis & UI Verification' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Upstream Analysis & UI Verification' (Protocol in workflow.md) [checkpoint: f53da79]
 
 ## Phase 2: Bridge Implementation (JavaScript)
-- [ ] Task: Refactor `updateCounter` in `plugin.js` to use native API methods.
+- [~] Task: Refactor `updateCounter` in `plugin.js` to use native API methods.
     - [ ] Sub-task: Remove the fake JSON-based counter stub.
     - [ ] Sub-task: Map `update_counter` requests to native `setCounter` or `incrementCounter` methods.
     - [ ] Sub-task: Build and package the updated `plugin.zip`.
