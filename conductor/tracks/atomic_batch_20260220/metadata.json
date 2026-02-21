@@ -1,0 +1,8 @@
+{
+  "track_id": "atomic_batch_20260220",
+  "type": "feature",
+  "status": "new",
+  "created_at": "2026-02-20T19:35:00Z",
+  "updated_at": "2026-02-20T19:35:00Z",
+  "description": "Refactor the 'atomic_batch' tool to utilize Super Productivity's new native batching or Redux dispatch capabilities. Currently, 'plugin.js' executes batch operations via a sequential loop, which causes race conditions and UI flickering."
+}
