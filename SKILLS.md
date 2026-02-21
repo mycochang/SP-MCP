@@ -221,3 +221,23 @@ This document defines standard workflows and skills for AI agents interacting wi
     - **Clarity Premium:** If the user says it needs refinement, ask for 2-3 bullet points. Call `update_task(task_id=..., notes=bullets)` to secure the +17% Clarity Premium.
     - **Decay Prevention:** If the task was created >14 days ago, suggest moving it to `#someday`.
       - **To apply #someday:** Call `get_tags()` to find the ID for "Someday". Call `update_task(task_id=..., tag_ids=["<Someday_Tag_ID>"])`.
+
+---
+
+## Skill: Autonomous Calendar Triage (Cross-Domain)
+
+**Goal:** Prevent scheduling overwhelm by continuously balancing Super Productivity task workloads against Google Calendar meeting realities. Automate the backlog deferral process.
+
+**Tools Required:** `google-workspace_get_events` (from google_workspace_mcp), `get_tasks` (from SP-MCP), `atomic_batch` (from SP-MCP)
+
+**Procedure:**
+1. **Observe (The Reality Check):**
+    - Call `google-workspace_get_events(time_min="today 00:00:00", time_max="today 23:59:59")`. Sum the total duration of today's meetings.
+    - Call `get_tasks(include_done=false)`. Filter for tasks scheduled for today or active in the current project context. Sum their `timeEstimate` values.
+2. **Orient (The Math):**
+    - Calculate Total Load: `(Meeting Hours) + (Task Estimates)`.
+    - If Total Load > 8 hours (or the user's defined workday limit): Identify low-priority tasks, un-estimated tasks, or tasks lacking the `#urgent` tag that can be deferred to reduce the load below the threshold.
+3. **Act (The Triage):**
+    - Construct an `atomic_batch` payload to defer the overflow tasks.
+    - To defer: Apply a `#someday` tag, move them to a backlog project, or clear their scheduling parameters.
+    - Summarize the actions taken to the user: *"You have 4 hours of meetings and 6 hours of tasks. You are over capacity. I am moving 2 hours of low-priority tasks to the backlog."*
