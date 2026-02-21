@@ -8,10 +8,10 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Upstream Analysis & UI Verification' (Protocol in workflow.md) [checkpoint: f53da79]
 
 ## Phase 2: Bridge Implementation (JavaScript)
-- [~] Task: Refactor `updateCounter` in `plugin.js` to use native API methods.
-    - [ ] Sub-task: Remove the fake JSON-based counter stub.
-    - [ ] Sub-task: Map `update_counter` requests to native `setCounter` or `incrementCounter` methods.
-    - [ ] Sub-task: Build and package the updated `plugin.zip`.
+- [x] Task: Refactor `updateCounter` in `plugin.js` to use native API methods. [93c4424]
+    - [x] Sub-task: Remove the fake JSON-based counter stub.
+    - [x] Sub-task: Map `update_counter` requests to native `setCounter` or `incrementCounter` methods.
+    - [x] Sub-task: Build and package the updated `plugin.zip`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Bridge Implementation (JavaScript)' (Protocol in workflow.md)
 
 ## Phase 3: Python Schema Updates
