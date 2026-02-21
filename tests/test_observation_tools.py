@@ -13,7 +13,7 @@ async def test_observe_context():
         result = await server.observe_context({})
         assert result['success'] is True
         assert result['active_task'] == 'test'
-        mock_send.assert_called_once_with('observeContext')
+        mock_send.assert_called_once_with('getCurrentContextTasks')
     
 @pytest.mark.asyncio
 async def test_get_workload_metrics():
@@ -24,3 +24,13 @@ async def test_get_workload_metrics():
         assert result['success'] is True
         assert 'metrics' in result
         mock_send.assert_called_once_with('getWorkloadMetrics')
+
+@pytest.mark.asyncio
+async def test_get_counters():
+    server = SuperProductivityMCPServer()
+    with patch.object(server, 'send_command', new_callable=AsyncMock) as mock_send:
+        mock_send.return_value = {"success": True, "counters": {"focus_score": 100}}
+        result = await server.get_counters({})
+        assert result['success'] is True
+        assert result['counters']['focus_score'] == 100
+        mock_send.assert_called_once_with('getCounters')

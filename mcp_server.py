@@ -328,12 +328,17 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
+                    name="get_counters",
+                    description="Read-only tool to fetch all simple counters from Super Productivity.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
                     name="update_counter",
-                    description="Update a plugin counter with strict validation.",
+                    description="Update a native simple counter with strict validation.",
                     inputSchema={
                         "type": "object",
                         "properties": {
-                            "counter_id": {"type": "string", "description": "ID of the counter to update"},
+                            "counter_id": {"type": "string", "description": "ID of the native counter to update (e.g., 'daily-pushups')"},
                             "value": {"type": "integer", "description": "New value for the counter"}
                         },
                         "required": ["counter_id", "value"]
@@ -377,6 +382,8 @@ class SuperProductivityMCPServer:
                     result = await self.observe_context(arguments)
                 elif name == "get_workload_metrics":
                     result = await self.get_workload_metrics(arguments)
+                elif name == "get_counters":
+                    result = await self.get_counters(arguments)
                 elif name == "atomic_batch":
                     result = await self.atomic_batch(arguments)
                 elif name == "update_counter":
@@ -613,6 +620,10 @@ class SuperProductivityMCPServer:
     async def get_workload_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Read-only tool to fetch the user's workload metrics."""
         return await self.send_command("getWorkloadMetrics")
+
+    async def get_counters(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch all simple counters."""
+        return await self.send_command("getCounters")
 
     async def atomic_batch(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Execute multiple write operations safely in a single batch using the native API."""
