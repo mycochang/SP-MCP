@@ -672,15 +672,7 @@ class MCPBridgePlugin {
           }
           break;
           
-        case 'notify':
-          try {
-            result = await PluginAPI.notify(command.message);
-          } catch (e) {
-            // Fallback - just log the message
-            console.log('Notification:', command.message);
-            result = { success: true, fallback: true };
-          }
-          break;
+
           
         case 'openDialog':
           result = await PluginAPI.openDialog(command.dialogConfig);
