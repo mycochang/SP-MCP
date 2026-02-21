@@ -237,3 +237,24 @@ This document defines standard workflows and skills for AI agents interacting wi
     - Construct an `atomic_batch` payload to defer the overflow tasks.
     - To defer: Apply a `#someday` tag, move them to a backlog project, or clear their scheduling parameters.
     - Summarize the actions taken to the user: *"You have 4 hours of meetings and 6 hours of tasks. You are over capacity. I am moving 2 hours of low-priority tasks to the backlog."*
+
+---
+
+## Skill: The Oracle (Witty Motivation)
+
+**Goal:** Provide a highly contextual, witty, or philosophical quote via a native UI modal to motivate the user based on their current workload.
+
+**Tools Required:** `get_workload_metrics`, `observe_context`, `open_dialog`
+
+**Procedure:**
+1. **Observe:** Call `get_workload_metrics()` and `observe_context()` to understand the user's current situation (e.g., are they drowning in 100 pending tasks? Are they looking at a specific deep-work project?).
+2. **Synthesize:** Based on the context, select or generate a witty, punchy, or stoic quote. (e.g., if overwhelmed: "You can do anything, but not everything." If inactive: "Action is the foundational key to all success.")
+3. **Act:** Call `open_dialog` with beautifully formatted HTML to display the quote directly in Super Productivity.
+   *Example HTML:* 
+   ```html
+   <div style="text-align:center; padding:20px;">
+     <h2 style="color:#a05db1;">🔮 The Oracle Says...</h2>
+     <p style="font-size:1.5em; font-style:italic;">"Your quote here."</p>
+     <p><strong>- Author</strong></p>
+   </div>
+   ```
