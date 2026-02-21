@@ -1,4 +1,0 @@
-mcp_server.py
-plugin.js
-tests/test_action_tools.py
-tests/test_observation_tools.py
