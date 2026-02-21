@@ -648,14 +648,27 @@ class MCPBridgePlugin {
         // UI operations
         case 'showSnack':
           try {
-            result = await PluginAPI.showSnack({
-              message: command.message,
-              type: 'SUCCESS'
+            PluginAPI.showSnack({
+              msg: command.message,
+              type: command.type || 'INFO'
             });
+            result = { success: true };
           } catch (e) {
-            // Fallback - just log the message
-            console.log('Snack message:', command.message);
-            result = { success: true, fallback: true };
+            console.error('Snack error:', e);
+            result = { success: false, error: e.message };
+          }
+          break;
+
+        case 'notify':
+          try {
+            await PluginAPI.notify({
+              title: command.title || 'Super Productivity AI',
+              body: command.message
+            });
+            result = { success: true };
+          } catch (e) {
+            console.error('Notify error:', e);
+            result = { success: false, error: e.message };
           }
           break;
           

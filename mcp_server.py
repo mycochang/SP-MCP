@@ -598,7 +598,11 @@ class SuperProductivityMCPServer:
 
     async def show_notification(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Show a notification"""
-        return await self.send_command("showSnack", message=args.get("message", ""))
+        message = args.get("message", "")
+        # Trigger an OS notification
+        await self.send_command("notify", title="Super Productivity AI", message=message)
+        # Also trigger the visual snackbar
+        return await self.send_command("showSnack", message=message, type="INFO")
 
     async def debug_directories(self, args: Dict[str, Any]) -> Dict[str, Any]:
         return {
