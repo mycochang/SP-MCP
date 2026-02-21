@@ -386,6 +386,8 @@ class SuperProductivityMCPServer:
                     result = await self.get_counters(arguments)
                 elif name == "atomic_batch":
                     result = await self.atomic_batch(arguments)
+                elif name == "get_productivity_audit":
+                    result = await self.get_productivity_audit(arguments)
                 elif name == "update_counter":
                     result = await self.update_counter(arguments)
                 else:
@@ -637,6 +639,41 @@ class SuperProductivityMCPServer:
             return {"success": False, "error": "project_id is required for atomic_batch"}
             
         return await self.send_command("batchOperation", projectId=project_id, operations=operations)
+
+    async def get_productivity_audit(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze task data and return a statistical summary."""
+        import time
+        
+        resp = await self.get_tasks({})
+        if not resp.get("success"):
+            return resp
+            
+        tasks = resp.get("result", [])
+        if not tasks:
+            return {"success": True, "report": "No tasks found to analyze."}
+            
+        now = time.time() * 1000
+        completed = [t for t in tasks if isinstance(t, dict) and t.get("isDone")]
+        incomplete = [t for t in tasks if isinstance(t, dict) and not t.get("isDone")]
+        
+        comp_rate = len(completed) / len(tasks) * 100 if tasks else 0
+        
+        with_notes = [t for t in tasks if isinstance(t, dict) and t.get("notes")]
+        without_notes = [t for t in tasks if isinstance(t, dict) and not t.get("notes")]
+        
+        notes_comp_rate = len([t for t in with_notes if t.get("isDone")]) / len(with_notes) * 100 if with_notes else 0
+        no_notes_comp_rate = len([t for t in without_notes if t.get("isDone")]) / len(without_notes) * 100 if without_notes else 0
+        
+        ages = [(now - t.get("created", now)) / 86400000 for t in incomplete if t.get("created")]
+        avg_age = sum(ages) / len(ages) if ages else 0
+        
+        estimated = [t for t in tasks if isinstance(t, dict) and t.get("timeEstimate", 0) > 0 and t.get("timeSpent", 0) > 0]
+        ratios = [t.get("timeSpent") / t.get("timeEstimate") for t in estimated]
+        avg_ratio = sum(ratios) / len(ratios) if ratios else 0
+        
+        report = f"Productivity Audit:\n- Completion Rate: {comp_rate:.1f}%\n- Clarity Premium: {(notes_comp_rate - no_notes_comp_rate):.1f}% (Notes {notes_comp_rate:.1f}% vs No Notes {no_notes_comp_rate:.1f}%)\n- Procrastination Window: {avg_age:.1f} days average age of incomplete tasks\n- Estimation Accuracy: {avg_ratio:.2f} (Time Spent / Estimated)\n- Sample Size: {len(tasks)} total tasks ({len(estimated)} with both estimates and spent time)"
+        
+        return {"success": True, "report": report}
 
     async def update_counter(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Update a plugin counter with strict validation."""

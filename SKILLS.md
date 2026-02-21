@@ -177,21 +177,17 @@ This document defines standard workflows and skills for AI agents interacting wi
 
 ## Skill: Weekly Productivity Audit (The "How did you know" Skill)
 
-**Goal:** Act as a data-driven mirror for the user. Analyze the raw task database to reveal hidden psychological patterns, estimation biases, and workflow bottlenecks.
+**Goal:** Act as a data-driven mirror for the user. Analyze the task database to reveal hidden psychological patterns, estimation biases, and workflow bottlenecks, and optionally save the findings to global memory.
 
-**Tools Required:** `get_tasks`, Python scripting (via `bash` or internal data analysis)
+**Tools Required:** `get_productivity_audit`, `memory_create_entities` (optional)
 
 **Procedure:**
-1. **Fetch:** Call `get_tasks(include_done=true)` to pull the entire task history.
-2. **Analyze (The Math):**
-   * Calculate the **Completion Rate**: `(Completed Tasks / Total Tasks) * 100`.
-   * Calculate the **Estimation Accuracy**: For tasks where `timeEstimate > 0` AND `timeSpent > 0`, calculate the average ratio `(timeSpent / timeEstimate)`. *Identify if the user overestimates or underestimates.*
-   * Calculate the **Clarity Premium**: Compare the completion rate of tasks with non-empty `notes` vs empty `notes`.
-   * Calculate the **Procrastination Window**: Find the average age of incomplete tasks (`current_time - created_time`).
-3. **Synthesize & Report:** Present the findings to the user as a "Psychological Profile". Focus on actionable insights:
-   * *Did they overestimate?* Tell them they have more free time than they think.
-   * *Are old tasks rotting?* Suggest a backlog purge.
-   * *Do notes help?* Reinforce the habit of writing 1-sentence descriptions before starting work.
+1. **Fetch:** Call the `get_productivity_audit` tool. This securely performs all mathematical analysis inside the Python MCP server without exploding the LLM token context.
+2. **Synthesize & Report:** Present the statistical findings to the user as a "Psychological Profile". Focus on actionable insights:
+   * *Did they overestimate?* (e.g., Time Spent / Estimated < 1.0). Tell them they have more free time than they think.
+   * *Are old tasks rotting?* (e.g., Procrastination Window > 14 days). Suggest a backlog purge.
+   * *Do notes help?* (e.g., Positive Clarity Premium). Reinforce the habit of writing 1-sentence descriptions before starting work.
+3. **Persist (The Memory Graph):** Call the `memory_create_entities` tool from the global memory server to save the metrics as an Entity of type `Productivity_Audit` (e.g. `{"name": "Audit_2026_W08", "entityType": "Audit", "observations": ["Procrastination window: 14 days", "Estimation Accuracy: 0.81"]}`). This allows cross-domain agents to read the user's burnout or velocity metrics next week.
 
 ---
 
