@@ -1,15 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="20" fill="#1e1e2e" />
-  <!-- Central chip body -->
-  <path d="M30 30 h40 v40 h-40 z" fill="none" stroke="#7aa2f7" stroke-width="6" stroke-linejoin="round"/>
-  <!-- Inner core -->
-  <rect x="42" y="42" width="16" height="16" rx="4" fill="#bb9af7" />
-  <!-- Left pins -->
-  <path d="M30 40 h-10 M30 50 h-10 M30 60 h-10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
-  <!-- Right pins -->
-  <path d="M70 40 h10 M70 50 h10 M70 60 h10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
-  <!-- Top pins -->
-  <path d="M40 30 v-10 M50 30 v-10 M60 30 v-10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
-  <!-- Bottom pins -->
-  <path d="M40 70 v10 M50 70 v10 M60 70 v10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+  <rect x="9" y="9" width="6" height="6"></rect>
+  <line x1="9" y1="1" x2="9" y2="4"></line>
+  <line x1="15" y1="1" x2="15" y2="4"></line>
+  <line x1="9" y1="20" x2="9" y2="23"></line>
+  <line x1="15" y1="20" x2="15" y2="23"></line>
+  <line x1="20" y1="9" x2="23" y2="9"></line>
+  <line x1="20" y1="14" x2="23" y2="14"></line>
+  <line x1="1" y1="9" x2="4" y2="9"></line>
+  <line x1="1" y1="14" x2="4" y2="14"></line>
 </svg>
