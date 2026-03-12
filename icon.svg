@@ -1,20 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Central Spine -->
   <line x1="50" y1="15" x2="50" y2="85" />
-  
-  <!-- Left M Wing -->
+  <!-- M Left -->
   <polyline points="20,45 20,15 50,45" />
-  
-  <!-- Right P Wing + Slash -->
+  <!-- P Right + Slash -->
   <polyline points="50,15 80,15 80,45 50,45" />
   <line x1="80" y1="15" x2="50" y2="45" />
-  
-  <!-- Bottom Left C Bracket -->
+  <!-- C Bottom Left -->
   <polyline points="50,55 20,55 20,85 50,85" />
   
-  <!-- Solid 'Presence' Dot (Right void) -->
-  <circle cx="80" cy="70" r="6" fill="currentColor" stroke="none" />
-  
-  <!-- Hollow 'Absence' Dot (Resting on the C spine to the left) -->
-  <circle cx="20" cy="70" r="6" fill="none" stroke="currentColor" stroke-width="4" />
+  <!-- Solid Dot (Right) -->
+  <circle cx="80" cy="70" r="4" fill="currentColor" stroke="none" />
+  <!-- Absence Dot (Left) -->
+  <circle cx="20" cy="70" r="4" fill="#1e1e1e" stroke="currentColor" stroke-width="3" />
 </svg>
