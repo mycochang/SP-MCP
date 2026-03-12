@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect width="100" height="100" rx="20" fill="#2d2d2d" />
-  <path d="M30 50 L70 50 M50 30 L50 70" stroke="#00d084" stroke-width="12" stroke-linecap="round" />
-  <circle cx="50" cy="50" r="8" fill="#fff" />
+  <rect width="100" height="100" rx="20" fill="#1e1e2e" />
+  <!-- Central chip body -->
+  <path d="M30 30 h40 v40 h-40 z" fill="none" stroke="#7aa2f7" stroke-width="6" stroke-linejoin="round"/>
+  <!-- Inner core -->
+  <rect x="42" y="42" width="16" height="16" rx="4" fill="#bb9af7" />
+  <!-- Left pins -->
+  <path d="M30 40 h-10 M30 50 h-10 M30 60 h-10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
+  <!-- Right pins -->
+  <path d="M70 40 h10 M70 50 h10 M70 60 h10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
+  <!-- Top pins -->
+  <path d="M40 30 v-10 M50 30 v-10 M60 30 v-10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
+  <!-- Bottom pins -->
+  <path d="M40 70 v10 M50 70 v10 M60 70 v10" stroke="#7aa2f7" stroke-width="5" stroke-linecap="round"/>
 </svg>
