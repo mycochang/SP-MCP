@@ -1,26 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
-  <!-- Central Staff (The Spine of Context) -->
-  <line x1="50" y1="10" x2="50" y2="90" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Center Spine -->
+  <line x1="50" y1="15" x2="50" y2="85" />
   
-  <!-- The M / W Crown (Model) -->
-  <polyline points="20,35 50,10 80,35" />
+  <!-- The M (Left Leg & Diagonal) -->
+  <polyline points="20,45 20,15 50,45" />
   
-  <!-- The Central Eye / Rhombus (Context / C / D) -->
-  <polygon points="50,30 75,50 50,70 25,50" />
+  <!-- The P & M (Right Side - P Loop + Right M Diagonal) -->
+  <polyline points="50,15 80,15 80,45 50,45" />
+  <line x1="80" y1="15" x2="50" y2="45" />
   
-  <!-- The L / P Hook (Left Side) -->
-  <polyline points="25,50 10,50 10,75" />
-  <circle cx="10" cy="75" r="3" fill="currentColor" stroke="none" />
+  <!-- The C (Bottom Left) -->
+  <polyline points="50,55 20,55 20,85 50,85" />
   
-  <!-- The R / X Ascending Branch (Right Side) -->
-  <line x1="75" y1="50" x2="90" y2="35" />
-  <circle cx="90" cy="35" r="3" fill="currentColor" stroke="none" />
-  
-  <!-- The T / N Base Cross (Protocol) -->
-  <line x1="30" y1="85" x2="70" y2="85" />
-  
-  <!-- Sigil Terminals (Power points) -->
-  <circle cx="20" cy="35" r="3" fill="currentColor" stroke="none" />
-  <circle cx="80" cy="35" r="3" fill="currentColor" stroke="none" />
-  <circle cx="50" cy="90" r="3" fill="currentColor" stroke="none" />
+  <!-- Sigil Anchor / Power Point (Bottom Right to balance the C) -->
+  <circle cx="65" cy="70" r="4" fill="currentColor" stroke="none" />
 </svg>
