@@ -1,10 +1,10 @@
 {
   "id": "sp-mcp-bridge",
   "name": "MCP Bridge",
-  "description": "Bridge between Super Productivity and MCP (Model Context Protocol) servers for Claude Desktop integration",
+  "description": "Bridge between Super Productivity and MCP (Model Context Protocol) servers, highly diverged and optimized for OpenCode integration",
   "version": "1.0.0",
   "manifestVersion": 1,
-  "author": "Super Productivity Team",
+  "author": "Super Productivity Community Member",
   "homepage": "https://github.com/johannesjo/super-productivity",
   "minSupVersion": "14.0.0",
   "permissions": ["nodeExecution"],
