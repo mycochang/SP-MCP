@@ -1,72 +1,66 @@
-# SP-MCP
+# SP-MCP (Advanced OpenCode Fork)
 
-Bridge between the amazing [Super Productivity](https://github.com/johannesjo/super-productivity/) app and MCP (Model Context Protocol) servers for Claude Desktop integration.
+**Welcome to the Advanced Community Fork of SP-MCP.** 
 
-This MCP and plugin allows Claude Desktop to directly interact with Super Productivity through the MCP protocol. Create update,tasks, manage projects and tags, and get information from Super Productivity.
+This repository is a heavily expanded, highly diverged fork of the original SP-MCP project. While the original was built purely as a basic Claude Desktop login, this fork has been transformed into a fully-featured, robust, and experimental bridge designed primarily for **OpenCode integration**, automated subagent workflows, native psych/productivity profiling, and complex local UI integrations.
 
-Make sure to backup your Super Productivity before using in case of data loss. I've provided a plugin.zip for convenience but feel free to make your own from the files.
+This MCP server acts as a bridge between the amazing [Super Productivity](https://github.com/johannesjo/super-productivity/) app and Model Context Protocol (MCP) clients.
 
-(Can't delete tasks right now (but it can mark them as done))
+> **Note:** Make sure to backup your Super Productivity data before using in case of data loss. We've provided a `plugin.zip` for convenience, but feel free to build your own from the source files.
+
+## Features (Advanced Fork)
+
+*   **Core Management:** Create and update tasks, manage projects, tags, and context.
+*   **OpenCode Optimized:** Native compatibility with OpenCode CLI, skills, and subagents.
+*   **Native Modals:** `open_dialog` tool to render native HTML/CSS interactive modals directly inside the Super Productivity UI.
+*   **Productivity Psych Audits:** Built-in `get_productivity_audit` to calculate burnout metrics and task friction without bloating LLM context windows.
+*   **SimpleCounters API:** Read and update native habit tracking and counters.
+*   **OS-Level Notifications:** Trigger native desktop notifications.
 
 ## Demo
 
 https://github.com/user-attachments/assets/cc118173-023f-48cb-8213-427027e475af
 
-
 ## Requirements
 
 - Super Productivity 14.0.0 or higher
-- Claude Desktop
-- Python 3.8 or higher
+- Python 3.10+
+- OpenCode / Claude Desktop / Any MCP-compatible client
+- `uv` (Recommended Python package manager)
 
 ## Installation
 
-### Automatic Setup
+### Recommended Setup (Using `uv`)
 
-**Windows:**
-1. Clone this repo
-2. Run `setup.bat`
-3. Follow the prompts
-
-**Linux/Mac UNTESTED:**
-1. Clone this repo
-2. Run `chmod +x setup.sh && ./setup.sh`
-3. Follow the prompts
-
-The setup scripts will preserve any existing MCP servers in your Claude Desktop configuration.
-
-You'll still have to install the plugin.zip manually in Super Productivity in settings->plugins.
-
-Once that's done, restart claude (and Super Prod for good measure) and you should be able to access your files
-
-### Manual Setup
-
-1. **Install Python dependencies:**
+1. **Clone this repo:**
    ```bash
-   pip install mcp
+   git clone https://github.com/mycochang/SP-MCP.git
+   cd SP-MCP
    ```
 
-2. **Set up MCP server:**
-   Copy `mcp_server.py` to your data directory:
-   - Windows: `%APPDATA%\super-productivity-mcp\`
-   - Linux: `~/.local/share/super-productivity-mcp/`
-   - macOS: `~/Library/Application Support/super-productivity-mcp/`
+2. **Sync Dependencies:**
+   ```bash
+   uv sync
+   ```
 
-3. **Configure Claude Desktop:**
-   Edit Claude's config file and add to `mcpServers`:
+3. **Install the plugin in Super Productivity:**
+   - Open Super Productivity → Settings → Importer/Exporter → Plugins (or Advanced -> Plugins).
+   - Click "Upload Plugin" or paste the contents of `plugin.js`.
+   - Alternatively, upload the provided `plugin.zip`.
+
+4. **Configure OpenCode (or Claude Desktop):**
+   Add the MCP server to your config file:
    ```json
    "super-productivity": {
-     "command": "python3",
-     "args": ["/path/to/mcp_server.py"]
+     "command": "uv",
+     "args": ["run", "/path/to/SP-MCP/mcp_server.py"]
    }
    ```
 
-4. **Install the plugin:**
-   - Open Super Productivity → Settings → Plugins
-   - Click "Upload Plugin"
-   - Select `plugin.js`
+5. **Restart your client (and Super Productivity).**
 
-5. **Restart Claude Desktop**
+### Legacy Automatic Setup (Not Recommended)
+The original `setup.sh` and `setup.bat` files are preserved for historical reasons but `uv run mcp_server.py` is the official supported method in this fork.
 
 ## Usage
 
@@ -89,30 +83,26 @@ Once that's done, restart claude (and Super Prod for good measure) and you shoul
 "Get all tags"
 ```
 
-## Dashboard
-
-Access the SP-MCP dashboard from the menu. The dashboard shows:
-- Real-time statistics
-- Connection status
-- Activity logs
-- Settings (polling frequency: default 2 seconds)
-
-## Communication
+## Communication Bridge
 
 The plugin uses file-based communication through:
 - Windows: `%APPDATA%\super-productivity-mcp\`
 - Linux: `~/.local/share/super-productivity-mcp/`
 - macOS: `~/Library/Application Support/super-productivity-mcp/`
 
-Commands are exchanged through `plugin_commands/` and `plugin_responses/` directories.
+Commands are exchanged asynchronously through `plugin_commands/` and `plugin_responses/` directories.
 
 ## Troubleshooting
 
 ### Plugin Not Loading
 - Check Super Productivity version (14.0.0+ required)
 - Verify plugin permissions include `nodeExecution`
+- If you made changes, ensure you bumped the version or re-pasted the new `plugin.js`.
 
-### Commands Not Working
-- Verify both plugin and MCP server are running
-- Check file permissions on communication directories
-- Check `mcp_server.log` in the data directory
+### Commands Not Working / Sync Failures
+- Run `uv run debug_bridge.py` to send a diagnostic ping.
+- Verify both the plugin and MCP server are looking at the exact same directory paths.
+- Check `mcp_server.log` in the local share directory.
+
+---
+*MIT License. Copyright (c) 2025 organicmoron, Copyright (c) 2026 Mike Chang.*
