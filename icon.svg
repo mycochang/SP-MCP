@@ -1,16 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Central Spine -->
   <line x1="50" y1="15" x2="50" y2="85" />
-  <!-- The M (Left Leg & Diagonal) -->
+  
+  <!-- Left M Wing -->
   <polyline points="20,45 20,15 50,45" />
-  <!-- The P & M (Right Side - P Loop + Right M Diagonal) -->
+  
+  <!-- Right P Wing + Slash -->
   <polyline points="50,15 80,15 80,45 50,45" />
   <line x1="80" y1="15" x2="50" y2="45" />
-  <!-- The C (Bottom Left) -->
+  
+  <!-- Bottom Left C Bracket -->
   <polyline points="50,55 20,55 20,85 50,85" />
   
-  <!-- Hollow 'Absence' Dot (Left) exactly matching the C's corner -->
-  <circle cx="20" cy="85" r="5" fill="#1e1e1e" stroke="currentColor" stroke-width="6" />
+  <!-- Solid 'Presence' Dot (Right void) -->
+  <circle cx="80" cy="70" r="6" fill="currentColor" stroke="none" />
   
-  <!-- Solid 'Presence' Dot (Right) exactly matching the size of the hollow dot -->
-  <circle cx="80" cy="85" r="8" fill="currentColor" stroke="none" />
+  <!-- Hollow 'Absence' Dot (Resting on the C spine to the left) -->
+  <circle cx="20" cy="70" r="6" fill="none" stroke="currentColor" stroke-width="4" />
 </svg>
