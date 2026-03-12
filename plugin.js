@@ -1,5 +1,4 @@
 // MCP Bridge Plugin for Super Productivity
-const PLUGIN_VERSION = "1.0.0";
 
 class MCPBridgePlugin {
   constructor() {
@@ -450,6 +449,17 @@ class MCPBridgePlugin {
         // Task operations
         case 'getTasks':
           result = await PluginAPI.getTasks();
+          if (result && result.length > 0) {
+             // DEBUG: Log the first task keys to see if we are missing anything
+             const sample = result.find(t => t.issueType === 'TRELLO');
+             if (sample) {
+                 await this.log(`[DEBUG] Keys for Trello Task: ${Object.keys(sample).join(', ')}`);
+                 // If issueData exists, log its keys too
+                 if (sample.issueData) {
+                     await this.log(`[DEBUG] issueData keys: ${Object.keys(sample.issueData).join(', ')}`);
+                 }
+             }
+          }
           break;
           
         case 'getArchivedTasks':
@@ -571,7 +581,29 @@ class MCPBridgePlugin {
 
         // Project operations
         case 'getAllProjects':
-          result = await PluginAPI.getAllProjects();
+          try {
+            // Attempt to get from standard API first
+            let projects = await PluginAPI.getAllProjects();
+            
+            // Supplement/verify with raw project data to ensure we don't miss any active projects
+            // (Standard API occasionally misses projects with 0 tasks or new projects)
+            const projectState = await PluginAPI.loadSyncedData('PROJECT');
+            if (projectState && projectState.entities) {
+               const rawProjects = Object.values(projectState.entities);
+               const activeRawProjects = rawProjects.filter(p => !p.isArchived);
+               
+               // Use raw data if it contains more active projects than the API result
+               const apiCount = Array.isArray(projects) ? projects.length : 0;
+               if (activeRawProjects.length > apiCount) {
+                 await this.log(`[DEBUG] getAllProjects discrepancy detected: API returns ${apiCount}, Raw State contains ${activeRawProjects.length}. Using raw data.`);
+                 projects = activeRawProjects;
+               }
+            }
+            result = projects;
+          } catch (error) {
+            await this.log(`[ERROR] getAllProjects failed: ${error.message}`);
+            throw error;
+          }
           break;
           
         case 'addProject':
@@ -604,115 +636,113 @@ class MCPBridgePlugin {
           break;
 
         // Board Management (Added for MCP)
-        case 'getBoards':
-          try {
-            const boardsData = await PluginAPI.loadSyncedData('boards');
-            // console.log('Boards data loaded:', JSON.stringify(boardsData));
-            if (boardsData && boardsData.boardCfgs) {
-              result = boardsData.boardCfgs;
-            } else {
-              result = [];
-            }
-          } catch (e) {
-            console.error('Failed to get boards:', e);
-            result = { error: 'Failed to fetch boards: ' + e.message };
-          }
-          break;
-
         case "createBoard":
         case "addBoard":
-          try {
-            const boardsData = await PluginAPI.loadSyncedData('boards') || { boardCfgs: [] };
-            if (!boardsData.boardCfgs) boardsData.boardCfgs = [];
-            
-            // Generate ID if not provided
-            const newBoard = {
-              id: command.data.id || 'BOARD_' + Date.now(),
-              ...command.data
-            };
-            
-            boardsData.boardCfgs.push(newBoard);
-            
-            await PluginAPI.persistDataSynced('boards', boardsData);
-            result = { success: true, message: "Board created", boardId: newBoard.id };
-          } catch (e) {
-            result = { success: false, error: 'Failed to create board: ' + e.message };
-          }
-          break;
-
-        case "updateBoard":
-          try {
-            const boardsData = await PluginAPI.loadSyncedData('boards');
-            if (!boardsData || !boardsData.boardCfgs) {
-              throw new Error('No boards found');
-            }
-            
-            const boardIndex = boardsData.boardCfgs.findIndex(b => b.id === command.boardId);
-            if (boardIndex === -1) {
-              throw new Error('Board not found');
-            }
-            
-            // Merge changes
-            boardsData.boardCfgs[boardIndex] = {
-              ...boardsData.boardCfgs[boardIndex],
-              ...command.data
-            };
-            
-            await PluginAPI.persistDataSynced('boards', boardsData);
-            result = { success: true, message: "Board updated" };
-          } catch (e) {
-            result = { success: false, error: 'Failed to update board: ' + e.message };
-          }
-          break;
-
-        case "deleteBoard":
-          try {
-            const boardsData = await PluginAPI.loadSyncedData('boards');
-            if (!boardsData || !boardsData.boardCfgs) {
-              throw new Error('No boards found');
-            }
-            
-            const initialLength = boardsData.boardCfgs.length;
-            boardsData.boardCfgs = boardsData.boardCfgs.filter(b => b.id !== command.boardId);
-            
-            if (boardsData.boardCfgs.length === initialLength) {
-              throw new Error('Board not found');
-            }
-            
-            await PluginAPI.persistDataSynced('boards', boardsData);
-            result = { success: true, message: "Board deleted" };
-          } catch (e) {
-            result = { success: false, error: 'Failed to delete board: ' + e.message };
-          }
+          await PluginAPI.dispatchAction({
+            type: "[Boards] Add Board",
+            board: command.data,
+          });
+          result = { success: true, message: "Board created" };
           break;
 
         // UI operations
         case 'showSnack':
           try {
-            result = await PluginAPI.showSnack({
-              message: command.message,
-              type: 'SUCCESS'
+            PluginAPI.showSnack({
+              msg: command.message || (command.data && command.data.msg) || "Success",
+              type: command.type || (command.data && command.data.type) || 'SUCCESS'
             });
+            result = { success: true };
           } catch (e) {
-            // Fallback - just log the message
-            console.log('Snack message:', command.message);
-            result = { success: true, fallback: true };
+            console.error('Snack error:', e);
+            result = { success: false, error: e.message };
+          }
+          break;
+
+        case 'notify':
+          try {
+            await PluginAPI.notify({
+              title: command.title || 'Super Productivity AI',
+              body: command.message
+            });
+            result = { success: true };
+          } catch (e) {
+            console.error('Notify error:', e);
+            result = { success: false, error: e.message };
           }
           break;
           
-        case 'notify':
-          try {
-            result = await PluginAPI.notify(command.message);
-          } catch (e) {
-            // Fallback - just log the message
-            console.log('Notification:', command.message);
-            result = { success: true, fallback: true };
-          }
-          break;
+
           
         case 'openDialog':
           result = await PluginAPI.openDialog(command.dialogConfig);
           break;
+
+        case 'observeContext': {
+          const activeTasks = await PluginAPI.getCurrentContextTasks();
+          const allProjects = await PluginAPI.getAllProjects();
+          const allTags = await PluginAPI.getAllTags();
+          result = {
+            activeTasks: activeTasks,
+            projects: allProjects,
+            tags: allTags,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'getWorkloadMetrics': {
+          const tasks = await PluginAPI.getTasks();
+          const archived = await PluginAPI.getArchivedTasks();
+          
+          const today = new Date().setHours(0, 0, 0, 0);
+          const completedToday = tasks.filter(t => t.isDone && t.doneOn >= today).length;
+          const pendingTasks = tasks.filter(t => !t.isDone).length;
+          
+          let totalEstimated = 0;
+          let totalSpent = 0;
+          tasks.forEach(t => {
+            totalEstimated += (t.timeEstimate || 0);
+            totalSpent += (t.timeSpent || 0);
+          });
+
+          result = {
+            totalTasks: tasks.length,
+            pendingTasks: pendingTasks,
+            completedToday: completedToday,
+            archivedTasks: archived.length,
+            totalTimeEstimatedMs: totalEstimated,
+            totalTimeSpentMs: totalSpent,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'updateCounter': {
+          const { counterId, value } = command;
+          if (!counterId) throw new Error('counterId is required');
+          if (typeof value !== 'number') throw new Error('value must be a number');
+          
+          await PluginAPI.setCounter(counterId, value);
+          
+          result = {
+            success: true,
+            counterId: counterId,
+            newValue: value,
+            timestamp: Date.now()
+          };
+          break;
+        }
+
+        case 'getCounters': {
+          const counters = await PluginAPI.getAllCounters();
+          result = {
+            success: true,
+            counters: counters,
+            timestamp: Date.now()
+          };
+          break;
+        }
 
         // Data persistence
         case 'persistDataSynced':
@@ -723,54 +753,79 @@ class MCPBridgePlugin {
           result = await PluginAPI.loadSyncedData(command.key);
           break;
 
-        case 'probeAPI':
-          const props = [];
-          let obj = PluginAPI;
-          while (obj) {
-            props.push(...Object.getOwnPropertyNames(obj));
-            obj = Object.getPrototypeOf(obj);
-          }
-          result = { 
-            properties: [...new Set(props)],
-            type: typeof PluginAPI,
-            version: PLUGIN_VERSION
-          };
-          break;
-
-        case 'dumpState':
-          const keys = ['boards', 'project', 'projects', 'task', 'config', 'globalConfig'];
-          const dump = {};
-          
-          for (const key of keys) {
-            try {
-              dump[key] = await PluginAPI.loadSyncedData(key);
-            } catch (e) {
-              dump[key] = `Error: ${e.message}`;
-            }
-          }
-          result = dump;
-          break;
-
-        case 'inspectData':
-           try {
-             const data = await PluginAPI.loadSyncedData(command.key);
-             result = { 
-               found: !!data, 
-               type: typeof data,
-               data: data 
-             };
-           } catch (e) {
-             result = { error: e.message };
-           }
-           break;
-
         // Custom batch operations
         case 'batchOperation':
-          result = await this.executeBatchOperation(command.operations);
+          const projectId = command.data && command.data.projectId ? command.data.projectId : command.projectId;
+          const operations = command.data && command.data.operations ? command.data.operations : command.operations;
+          
+          if (PluginAPI.batchUpdateForProject && projectId) {
+            result = await PluginAPI.batchUpdateForProject({ projectId: projectId, operations: operations });
+          } else {
+            // Fallback to sequential execution if no project ID is provided or API is missing
+            result = await this.executeBatchOperation(operations);
+          }
           break;
           
+        
+        // Dynamic Fallback for ANY PluginAPI method not explicitly handled above
+        
+        case 'dispatchAction':
+          result = await PluginAPI.dispatchAction(command.data.actionName || command.data.type, command.data.payload || command.data);
+          break;
+          
+        case 'triggerSync':
+          result = await PluginAPI.triggerSync();
+          break;
+          
+        case 'getConfig':
+          result = await PluginAPI.getConfig();
+          break;
+          
+        case 'deleteTask':
+          // The API might not have deleteTask directly working as expected, but let's try calling it, 
+          // or fallback to archiveTask.
+          if (typeof PluginAPI.deleteTask === 'function') {
+            result = await PluginAPI.deleteTask(command.data.taskId || command.data);
+          } else {
+            await PluginAPI.updateTask(command.data.taskId || command.data, { isDone: true });
+            result = { success: true, fallback: "marked as done" };
+          }
+          break;
+          
+        
+        
+        
+        
+        case 'debugPluginState':
+          const bridgeProps = PluginAPI._pluginBridge ? Object.keys(PluginAPI._pluginBridge) : [];
+          result = { 
+            apiProps: Object.keys(PluginAPI), 
+            bridgeProps: bridgeProps 
+          };
+          break;
+        
+
         default:
-          throw new Error(`Unknown command action: ${command.action}`);
+          if (typeof PluginAPI[command.action] === 'function') {
+            await this.log(`[Dynamic Invoke] Calling PluginAPI.${command.action}`);
+            // To handle multiple arguments, if command.data is an array, spread it.
+            // If it's an object with args array, spread that.
+            // Otherwise, just pass command.data as the single argument.
+            if (Array.isArray(command.data)) {
+                result = await PluginAPI[command.action](...command.data);
+            } else if (command.data && Array.isArray(command.data.args)) {
+                result = await PluginAPI[command.action](...command.data.args);
+            } else if (command.data !== undefined && Object.keys(command.data).length > 0) {
+                // Heuristic: if action ends with 'Id', or similar, maybe it's not an object.
+                // But most PluginAPI methods take an object or string.
+                result = await PluginAPI[command.action](command.data);
+            } else {
+                result = await PluginAPI[command.action]();
+            }
+          } else {
+            throw new Error(`Unknown command action or not a function: ${command.action}`);
+          }
+
       }
       
       const executionTime = Date.now() - startTime;

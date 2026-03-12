@@ -15,8 +15,6 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
-SERVER_VERSION = "1.0.0"
-
 
 class SuperProductivityMCPServer:
     def __init__(self):
@@ -86,49 +84,6 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
-                    name="update_project",
-                    description="Update an existing project (e.g., change title, color, or archive it)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "project_id": {"type": "string", "description": "Project ID to update"},
-                            "title": {"type": "string", "description": "New project title"},
-                            "description": {"type": "string", "description": "New project description"},
-                            "color": {"type": "string", "description": "New project color (hex code)"},
-                            "is_archived": {"type": "boolean", "description": "Archive the project (acts like deletion)"}
-                        },
-                        "required": ["project_id"],
-                    },
-                ),
-                types.Tool(
-                    name="get_current_context_tasks",
-                    description="Get tasks for the currently focused view/context in Super Productivity",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="reorder_tasks",
-                    description="Reorder tasks manually within a specific context",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_ids": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "description": "List of task IDs in the new desired order"
-                            },
-                            "context_id": {
-                                "type": "string",
-                                "description": "ID of the context (e.g. project ID, tag ID, or 'TODAY')"
-                            },
-                            "context_type": {
-                                "type": "string",
-                                "description": "Type of context ('PROJECT', 'TAG', 'TODAY')"
-                            }
-                        },
-                        "required": ["task_ids", "context_id", "context_type"],
-                    },
-                ),
-                types.Tool(
                     name="get_tasks",
                     description="Get all tasks from Super Productivity",
                     inputSchema={
@@ -140,6 +95,14 @@ class SuperProductivityMCPServer:
                                 "default": True,
                             }
                         },
+                    },
+                ),
+                types.Tool(
+                    name="get_archived_tasks",
+                    description="Get all historically archived tasks from Super Productivity to analyze past performance and metrics.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {}
                     },
                 ),
                 types.Tool(
@@ -201,25 +164,6 @@ class SuperProductivityMCPServer:
                     inputSchema={"type": "object", "properties": {}},
                 ),
                 types.Tool(
-                    name="create_project",
-                    description="Create a new project",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "title": {"type": "string", "description": "Project title"},
-                            "description": {
-                                "type": "string",
-                                "description": "Project description",
-                            },
-                            "color": {
-                                "type": "string",
-                                "description": "Project color (hex code)",
-                            },
-                        },
-                        "required": ["title"],
-                    },
-                ),
-                types.Tool(
                     name="update_project",
                     description="Update an existing project (e.g., change title, color, or archive it)",
                     inputSchema={
@@ -260,6 +204,25 @@ class SuperProductivityMCPServer:
                             }
                         },
                         "required": ["task_ids", "context_id", "context_type"],
+                    },
+                ),
+                types.Tool(
+                    name="create_project",
+                    description="Create a new project",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "title": {"type": "string", "description": "Project title"},
+                            "description": {
+                                "type": "string",
+                                "description": "Project description",
+                            },
+                            "color": {
+                                "type": "string",
+                                "description": "Project color (hex code)",
+                            },
+                        },
+                        "required": ["title"],
                     },
                 ),
                 types.Tool(
@@ -280,49 +243,6 @@ class SuperProductivityMCPServer:
                             },
                         },
                         "required": ["title"],
-                    },
-                ),
-                types.Tool(
-                    name="update_project",
-                    description="Update an existing project (e.g., change title, color, or archive it)",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "project_id": {"type": "string", "description": "Project ID to update"},
-                            "title": {"type": "string", "description": "New project title"},
-                            "description": {"type": "string", "description": "New project description"},
-                            "color": {"type": "string", "description": "New project color (hex code)"},
-                            "is_archived": {"type": "boolean", "description": "Archive the project (acts like deletion)"}
-                        },
-                        "required": ["project_id"],
-                    },
-                ),
-                types.Tool(
-                    name="get_current_context_tasks",
-                    description="Get tasks for the currently focused view/context in Super Productivity",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="reorder_tasks",
-                    description="Reorder tasks manually within a specific context",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "task_ids": {
-                                "type": "array",
-                                "items": {"type": "string"},
-                                "description": "List of task IDs in the new desired order"
-                            },
-                            "context_id": {
-                                "type": "string",
-                                "description": "ID of the context (e.g. project ID, tag ID, or 'TODAY')"
-                            },
-                            "context_type": {
-                                "type": "string",
-                                "description": "Type of context ('PROJECT', 'TAG', 'TODAY')"
-                            }
-                        },
-                        "required": ["task_ids", "context_id", "context_type"],
                     },
                 ),
                 types.Tool(
@@ -364,49 +284,6 @@ class SuperProductivityMCPServer:
                             }
                         },
                         "required": ["tag_id"],
-                    },
-                ),
-                types.Tool(
-                    name="get_boards",
-                    description="Get all Kanban boards and their configurations",
-                    inputSchema={"type": "object", "properties": {}},
-                ),
-                types.Tool(
-                    name="update_board",
-                    description="Update an existing board configuration",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "board_id": {
-                                "type": "string",
-                                "description": "Board ID to update",
-                            },
-                            "title": {"type": "string", "description": "New board title"},
-                            "cols": {
-                                "type": "integer",
-                                "description": "New number of columns",
-                            },
-                            "panels": {
-                                "type": "array",
-                                "description": "New list of panel configurations",
-                                "items": {"type": "object"},
-                            },
-                        },
-                        "required": ["board_id"],
-                    },
-                ),
-                types.Tool(
-                    name="delete_board",
-                    description="Delete a board",
-                    inputSchema={
-                        "type": "object",
-                        "properties": {
-                            "board_id": {
-                                "type": "string",
-                                "description": "Board ID to delete",
-                            }
-                        },
-                        "required": ["board_id"],
                     },
                 ),
                 types.Tool(
@@ -454,6 +331,86 @@ class SuperProductivityMCPServer:
                     description="Debug the communication directories and show their status",
                     inputSchema={"type": "object", "properties": {}},
                 ),
+                types.Tool(
+                    name="observe_context",
+                    description="Read-only tool to fetch the user's active context.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="get_workload_metrics",
+                    description="Read-only tool to fetch the user's workload metrics.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="atomic_batch",
+                    description="Execute multiple write operations safely in a single batch using the native SP PluginAPI.batchUpdateForProject. This allows creating parent and child tasks simultaneously using tempIds.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "project_id": {
+                                "type": "string", 
+                                "description": "The Super Productivity Project ID to apply this batch to. REQUIRED."
+                            },
+                            "operations": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "type": {"type": "string", "enum": ["create", "update", "delete", "reorder"], "description": "Action to perform"},
+                                        "tempId": {"type": "string", "description": "Temporary ID for create operations to allow linking subtasks"},
+                                        "taskId": {"type": "string", "description": "Existing task ID for update, delete, or reorder"},
+                                        "data": {"type": "object", "description": "Data for create operations (title, notes, parentId, timeEstimate)"},
+                                        "updates": {"type": "object", "description": "Data for update operations (title, notes, isDone, timeEstimate)"},
+                                        "taskIds": {"type": "array", "items": {"type": "string"}, "description": "Array of task IDs for reorder operations"}
+                                    },
+                                    "required": ["type"]
+                                }
+                            }
+                        },
+                        "required": ["project_id", "operations"]
+                    },
+                ),
+                types.Tool(
+                    name="get_counters",
+                    description="Read-only tool to fetch all simple counters from Super Productivity.",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="get_productivity_audit",
+                    description="Calculate a psychological and productivity audit based on recent tasks to determine burnout risk, focus fragmentation, and task friction. Runs natively via the plugin.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "days": {
+                                "type": "integer",
+                                "description": "Number of days to analyze (default: 7)"
+                            }
+                        }
+                    },
+                ),
+                types.Tool(
+                    name="open_dialog",
+                    description="Show an interactive native dialog modal in the Super Productivity UI.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "htmlContent": {"type": "string", "description": "HTML content for the modal body"}
+                        },
+                        "required": ["htmlContent"]
+                    },
+                ),
+                types.Tool(
+                    name="update_counter",
+                    description="Update a native simple counter with strict validation.",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "counter_id": {"type": "string", "description": "ID of the native counter to update (e.g., 'daily-pushups')"},
+                            "value": {"type": "integer", "description": "New value for the counter"}
+                        },
+                        "required": ["counter_id", "value"]
+                    },
+                ),
             ]
 
         @self.server.call_tool()
@@ -464,12 +421,8 @@ class SuperProductivityMCPServer:
                     result = await self.create_task(arguments)
                 elif name == "get_tasks":
                     result = await self.get_tasks(arguments)
-                elif name == "get_boards":
-                    result = await self.get_boards(arguments)
-                elif name == "update_board":
-                    result = await self.update_board(arguments)
-                elif name == "delete_board":
-                    result = await self.delete_board(arguments)
+                elif name == "get_archived_tasks":
+                    result = await self.get_archived_tasks(arguments)
                 elif name == "update_task":
                     result = await self.update_task(arguments)
                 elif name == "complete_and_archive_task":
@@ -498,10 +451,24 @@ class SuperProductivityMCPServer:
                     result = await self.show_notification(arguments)
                 elif name == "debug_directories":
                     result = await self.debug_directories(arguments)
+                elif name == "observe_context":
+                    result = await self.observe_context(arguments)
+                elif name == "get_workload_metrics":
+                    result = await self.get_workload_metrics(arguments)
+                elif name == "get_counters":
+                    result = await self.get_counters(arguments)
+                elif name == "atomic_batch":
+                    result = await self.atomic_batch(arguments)
+                elif name == "get_productivity_audit":
+                    result = await self.get_productivity_audit(arguments)
+                elif name == "open_dialog":
+                    result = await self.open_dialog(arguments)
+                elif name == "update_counter":
+                    result = await self.update_counter(arguments)
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
-                return [types.TextContent(type="text", text=json.dumps(result))]
+                return [types.TextContent(type="text", text=str(result))]
 
             except Exception as e:
                 logging.error(f"Error in tool {name}: {str(e)}")
@@ -526,7 +493,7 @@ class SuperProductivityMCPServer:
         # Wait for response (with timeout)
         response_file = self.response_dir / f"{command['id']}_response.json"
 
-        for _ in range(30):  # Wait up to 30 seconds
+        for _ in range(120):  # Wait up to 120 seconds
             if response_file.exists():
                 try:
                     with open(response_file, "r") as f:
@@ -590,69 +557,42 @@ class SuperProductivityMCPServer:
 
         return await self.send_command("addTask", data=task_data)
 
-    async def get_tasks(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+    async def get_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tasks"""
-        include_done = arguments.get("include_done", True)
+        return await self.send_command("getTasks")
 
-        result = await self.send_command("getTasks")
-
-        if result.get("success"):
-            tasks = result.get("result", [])
-            if not include_done:
-                tasks = [t for t in tasks if not t.get("isDone", False)]
-            return {"success": True, "result": tasks}
-        else:
-            return result
-
-    async def get_boards(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
-        """Get all boards"""
-        return await self.send_command("getBoards")
-
-    async def update_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Update a board"""
-        board_id = args.get("board_id")
-        if not board_id:
-            return {"success": False, "error": "board_id is required"}
-
-        updates = {}
-        if "title" in args:
-            updates["title"] = args["title"]
-        if "cols" in args:
-            updates["cols"] = args["cols"]
-        if "panels" in args:
-            updates["panels"] = args["panels"]
-
-        return await self.send_command("updateBoard", boardId=board_id, data=updates)
-
-    async def delete_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Delete a board"""
-        board_id = args.get("board_id")
-        if not board_id:
-            return {"success": False, "error": "board_id is required"}
-        return await self.send_command("deleteBoard", boardId=board_id)
+    async def get_archived_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get all archived tasks"""
+        return await self.send_command("getArchivedTasks")
 
     async def update_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Update an existing task"""
+        """Update a task"""
         task_id = args.get("task_id")
         if not task_id:
             return {"success": False, "error": "task_id is required"}
 
-        # Prepare update data
-        update_data = {}
-        if "title" in args:
-            update_data["title"] = args["title"]
-        if "notes" in args:
-            update_data["notes"] = args["notes"]
-        if "is_done" in args:
-            update_data["isDone"] = args["is_done"]
-        if "time_estimate" in args:
-            update_data["timeEstimate"] = args["time_estimate"]
-        if "time_spent" in args:
-            update_data["timeSpent"] = args["time_spent"]
-        if "tag_ids" in args:
-            update_data["tagIds"] = args["tag_ids"]
+        updates = {}
 
-        return await self.send_command("updateTask", taskId=task_id, data=update_data)
+        # Handle title - Claude should have already converted natural language to SP syntax
+        if "title" in args:
+            updates["title"] = args["title"]
+
+        if "notes" in args:
+            updates["notes"] = args["notes"]
+        if "is_done" in args:
+            updates["isDone"] = args["is_done"]
+            if args["is_done"]:
+                updates["doneOn"] = asyncio.get_event_loop().time() * 1000
+            else:
+                updates["doneOn"] = None
+        if "time_estimate" in args:
+            updates["timeEstimate"] = args["time_estimate"]
+        if "time_spent" in args:
+            updates["timeSpent"] = args["time_spent"]
+        if "tag_ids" in args:
+            updates["tagIds"] = args["tag_ids"]
+
+        return await self.send_command("updateTask", taskId=task_id, data=updates)
 
     async def complete_and_archive_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Complete a task (mark as done) - true deletion is not supported"""
@@ -676,6 +616,7 @@ class SuperProductivityMCPServer:
         }
 
         return await self.send_command("addProject", data=project_data)
+
 
     async def update_project(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Update an existing project"""
@@ -701,7 +642,6 @@ class SuperProductivityMCPServer:
                                      taskIds=args["task_ids"], 
                                      contextId=args["context_id"], 
                                      contextType=args["context_type"])
-
 
     async def get_tags(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tags"""
@@ -761,7 +701,11 @@ class SuperProductivityMCPServer:
 
     async def show_notification(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Show a notification"""
-        return await self.send_command("showSnack", message=args.get("message", ""))
+        message = args.get("message", "")
+        # Trigger an OS notification
+        await self.send_command("notify", title="Super Productivity AI", message=message)
+        # Also trigger the visual snackbar
+        return await self.send_command("showSnack", message=message, type="INFO")
 
     async def debug_directories(self, args: Dict[str, Any]) -> Dict[str, Any]:
         return {
@@ -775,6 +719,83 @@ class SuperProductivityMCPServer:
                 "responses": self.response_dir.exists(),
             },
         }
+
+    async def observe_context(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch the user's currently active tasks and view context."""
+        return await self.send_command("getCurrentContextTasks")
+
+    async def get_workload_metrics(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch the user's workload metrics."""
+        return await self.send_command("getWorkloadMetrics")
+
+    async def get_counters(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Read-only tool to fetch all simple counters."""
+        return await self.send_command("getCounters")
+
+    async def atomic_batch(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute multiple write operations safely in a single batch using the native API."""
+        operations = args.get("operations", [])
+        project_id = args.get("project_id")
+        if not project_id:
+            return {"success": False, "error": "project_id is required for atomic_batch"}
+            
+        return await self.send_command("batchOperation", projectId=project_id, operations=operations)
+
+    async def get_productivity_audit(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Analyze task data and return a statistical summary."""
+        import time
+        
+        resp = await self.get_tasks({})
+        if not resp.get("success"):
+            return resp
+            
+        tasks = resp.get("result", [])
+        if not tasks:
+            return {"success": True, "report": "No tasks found to analyze."}
+            
+        now = time.time() * 1000
+        completed = [t for t in tasks if isinstance(t, dict) and t.get("isDone")]
+        incomplete = [t for t in tasks if isinstance(t, dict) and not t.get("isDone")]
+        
+        comp_rate = len(completed) / len(tasks) * 100 if tasks else 0
+        
+        with_notes = [t for t in tasks if isinstance(t, dict) and t.get("notes")]
+        without_notes = [t for t in tasks if isinstance(t, dict) and not t.get("notes")]
+        
+        notes_comp_rate = len([t for t in with_notes if t.get("isDone")]) / len(with_notes) * 100 if with_notes else 0
+        no_notes_comp_rate = len([t for t in without_notes if t.get("isDone")]) / len(without_notes) * 100 if without_notes else 0
+        
+        ages = [(now - t.get("created", now)) / 86400000 for t in incomplete if t.get("created")]
+        avg_age = sum(ages) / len(ages) if ages else 0
+        
+        estimated = [t for t in tasks if isinstance(t, dict) and t.get("timeEstimate", 0) > 0 and t.get("timeSpent", 0) > 0]
+        ratios = [t.get("timeSpent") / t.get("timeEstimate") for t in estimated]
+        avg_ratio = sum(ratios) / len(ratios) if ratios else 0
+        
+        report = f"Productivity Audit:\n- Completion Rate: {comp_rate:.1f}%\n- Clarity Premium: {(notes_comp_rate - no_notes_comp_rate):.1f}% (Notes {notes_comp_rate:.1f}% vs No Notes {no_notes_comp_rate:.1f}%)\n- Procrastination Window: {avg_age:.1f} days average age of incomplete tasks\n- Estimation Accuracy: {avg_ratio:.2f} (Time Spent / Estimated)\n- Sample Size: {len(tasks)} total tasks ({len(estimated)} with both estimates and spent time)"
+        
+        return {"success": True, "report": report}
+
+    async def open_dialog(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Show a native modal dialog"""
+        content = args.get("htmlContent")
+        if not content:
+            return {"success": False, "error": "htmlContent is required"}
+            
+        dialog_cfg = {
+            "htmlContent": content
+        }
+        return await self.send_command("openDialog", dialogConfig=dialog_cfg)
+
+    async def update_counter(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a plugin counter with strict validation."""
+        counter_id = args.get("counter_id")
+        value = args.get("value")
+        
+        if not isinstance(value, int):
+            return {"success": False, "error": "Value must be an integer"}
+            
+        return await self.send_command("updateCounter", counterId=counter_id, value=value)
 
     async def run(self):
         """Run the MCP server"""
