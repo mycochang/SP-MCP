@@ -920,7 +920,7 @@ class MCPBridgePlugin {
     // Register menu entry only (no header button to avoid duplicates)
     PluginAPI.registerMenuEntry({
       label: 'MCP Bridge Dashboard',
-      icon: 'dashboard',
+      icon: 'hub',
       onClick: () => {
         PluginAPI.showIndexHtmlAsView();
       }
