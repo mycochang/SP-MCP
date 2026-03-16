@@ -12,7 +12,7 @@
   "categories": ["integration", "automation"],
   "tags": ["mcp", "claude", "ai", "integration"],
   "iFrame": true,
-  "isSkipMenuEntry": false,
+  "isSkipMenuEntry": true,
   "hooks": ["taskUpdate", "taskComplete", "taskDelete", "currentTaskChange"],
   "changelog": {
     "1.0.0": "Initial release with full MCP bridge functionality"
