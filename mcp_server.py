@@ -15,6 +15,8 @@ import mcp.types as types
 from mcp.server import NotificationOptions, Server
 from mcp.server.models import InitializationOptions
 
+SERVER_VERSION = "1.0.0"
+
 
 class SuperProductivityMCPServer:
     def __init__(self):
@@ -175,6 +177,21 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
+                    name="update_project",
+                    description="Update an existing project (e.g., change title, color, or archive it)",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "project_id": {"type": "string", "description": "Project ID to update"},
+                            "title": {"type": "string", "description": "New project title"},
+                            "description": {"type": "string", "description": "New project description"},
+                            "color": {"type": "string", "description": "New project color (hex code)"},
+                            "is_archived": {"type": "boolean", "description": "Archive the project (acts like deletion)"}
+                        },
+                        "required": ["project_id"],
+                    },
+                ),
+                types.Tool(
                     name="get_tags",
                     description="Get all tags from Super Productivity",
                     inputSchema={"type": "object", "properties": {}},
@@ -236,6 +253,11 @@ class SuperProductivityMCPServer:
                     },
                 ),
                 types.Tool(
+                    name="get_boards",
+                    description="Get all Kanban boards and their configurations",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
                     name="create_board",
                     description="Create a new Kanban board configuration",
                     inputSchema={
@@ -253,6 +275,72 @@ class SuperProductivityMCPServer:
                             },
                         },
                         "required": ["title", "panels"],
+                    },
+                ),
+                types.Tool(
+                    name="update_board",
+                    description="Update an existing board configuration",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "board_id": {
+                                "type": "string",
+                                "description": "Board ID to update",
+                            },
+                            "title": {"type": "string", "description": "New board title"},
+                            "cols": {
+                                "type": "integer",
+                                "description": "New number of columns",
+                            },
+                            "panels": {
+                                "type": "array",
+                                "description": "New list of panel configurations",
+                                "items": {"type": "object"},
+                            },
+                        },
+                        "required": ["board_id"],
+                    },
+                ),
+                types.Tool(
+                    name="delete_board",
+                    description="Delete a board",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "board_id": {
+                                "type": "string",
+                                "description": "Board ID to delete",
+                            }
+                        },
+                        "required": ["board_id"],
+                    },
+                ),
+                types.Tool(
+                    name="get_current_context_tasks",
+                    description="Get tasks for the currently focused view/context in Super Productivity",
+                    inputSchema={"type": "object", "properties": {}},
+                ),
+                types.Tool(
+                    name="reorder_tasks",
+                    description="Reorder tasks manually within a specific context",
+                    inputSchema={
+                        "type": "object",
+                        "properties": {
+                            "task_ids": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                                "description": "List of task IDs in the new desired order"
+                            },
+                            "context_id": {
+                                "type": "string",
+                                "description": "ID of the context (e.g. project ID, tag ID, or 'TODAY')"
+                            },
+                            "context_type": {
+                                "type": "string",
+                                "description": "Type of context ('PROJECT', 'TAG', 'TODAY')"
+                            }
+                        },
+                        "required": ["task_ids", "context_id", "context_type"],
                     },
                 ),
                 types.Tool(
@@ -290,6 +378,12 @@ class SuperProductivityMCPServer:
                     result = await self.create_task(arguments)
                 elif name == "get_tasks":
                     result = await self.get_tasks(arguments)
+                elif name == "get_boards":
+                    result = await self.get_boards(arguments)
+                elif name == "update_board":
+                    result = await self.update_board(arguments)
+                elif name == "delete_board":
+                    result = await self.delete_board(arguments)
                 elif name == "update_task":
                     result = await self.update_task(arguments)
                 elif name == "complete_and_archive_task":
@@ -298,6 +392,12 @@ class SuperProductivityMCPServer:
                     result = await self.get_projects(arguments)
                 elif name == "create_project":
                     result = await self.create_project(arguments)
+                elif name == "update_project":
+                    result = await self.update_project(arguments)
+                elif name == "get_current_context_tasks":
+                    result = await self.get_current_context_tasks(arguments)
+                elif name == "reorder_tasks":
+                    result = await self.reorder_tasks(arguments)
                 elif name == "get_tags":
                     result = await self.get_tags(arguments)
                 elif name == "create_tag":
@@ -315,7 +415,7 @@ class SuperProductivityMCPServer:
                 else:
                     raise ValueError(f"Unknown tool: {name}")
 
-                return [types.TextContent(type="text", text=str(result))]
+                return [types.TextContent(type="text", text=json.dumps(result))]
 
             except Exception as e:
                 logging.error(f"Error in tool {name}: {str(e)}")
@@ -340,7 +440,7 @@ class SuperProductivityMCPServer:
         # Wait for response (with timeout)
         response_file = self.response_dir / f"{command['id']}_response.json"
 
-        for _ in range(120):  # Wait up to 120 seconds
+        for _ in range(30):  # Wait up to 30 seconds
             if response_file.exists():
                 try:
                     with open(response_file, "r") as f:
@@ -367,83 +467,91 @@ class SuperProductivityMCPServer:
     def parse_task_syntax(self, title: str) -> tuple:
         """Parse Super Productivity task syntax from title"""
         title_clean = title
-
-        # Extract tags from title (format: #tagname)
         tag_matches = re.findall(r"#(\w+)", title_clean)
         title_clean = re.sub(r"\s*#\w+", "", title_clean).strip()
-
-        # Extract projects from title (format: +projectname)
         project_matches = re.findall(r"\+(\w+)", title_clean)
         title_clean = re.sub(r"\s*\+\w+", "", title_clean).strip()
-
-        # Extract scheduling syntax (format: @fri 4pm, @tomorrow, @2024-01-15, etc.)
         schedule_matches = re.findall(r"@(\w+(?:\s+\d+[ap]m)?)", title_clean, re.IGNORECASE)
-        title_clean = re.sub(
-            r"\s*@\w+(?:\s+\d+[ap]m)?", "", title_clean, flags=re.IGNORECASE
-        ).strip()
-
-        # Extract time estimate/spent syntax (format: 10m/3h, 2h, 30m, etc.)
+        title_clean = re.sub(r"\s*@\w+(?:\s+\d+[ap]m)?", "", title_clean, flags=re.IGNORECASE).strip()
         time_matches = re.findall(r"(\d+[mh](?:/\d+[mh])?)", title_clean)
         title_clean = re.sub(r"\s*\d+[mh](?:/\d+[mh])?", "", title_clean).strip()
-
         return title_clean, tag_matches, project_matches, schedule_matches, time_matches
 
     async def create_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Create a new task"""
         title = args.get("title", "")
-
-        # Create the task data - Claude should have already converted natural language to SP syntax
         task_data = {
-            "title": title,  # Use title as provided by Claude (should already have @syntax)
+            "title": title,
             "notes": args.get("notes", ""),
             "timeEstimate": args.get("time_estimate", 0),
             "projectId": args.get("project_id"),
             "parentId": args.get("parent_id"),
             "tagIds": [],
         }
-
         return await self.send_command("addTask", data=task_data)
 
-    async def get_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+    async def get_tasks(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tasks"""
-        return await self.send_command("getTasks")
+        include_done = arguments.get("include_done", True)
+        result = await self.send_command("getTasks")
+        if result.get("success"):
+            tasks = result.get("result", [])
+            if not include_done:
+                tasks = [t for t in tasks if not t.get("isDone", False)]
+            return {"success": True, "result": tasks}
+        else:
+            return result
+
+    async def get_boards(self, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        """Get all boards"""
+        return await self.send_command("getBoards")
+
+    async def update_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update a board"""
+        board_id = args.get("board_id")
+        if not board_id:
+            return {"success": False, "error": "board_id is required"}
+        updates = {}
+        if "title" in args:
+            updates["title"] = args["title"]
+        if "cols" in args:
+            updates["cols"] = args["cols"]
+        if "panels" in args:
+            updates["panels"] = args["panels"]
+        return await self.send_command("updateBoard", boardId=board_id, data=updates)
+
+    async def delete_board(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Delete a board"""
+        board_id = args.get("board_id")
+        if not board_id:
+            return {"success": False, "error": "board_id is required"}
+        return await self.send_command("deleteBoard", boardId=board_id)
 
     async def update_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
-        """Update a task"""
+        """Update an existing task"""
         task_id = args.get("task_id")
         if not task_id:
             return {"success": False, "error": "task_id is required"}
-
-        updates = {}
-
-        # Handle title - Claude should have already converted natural language to SP syntax
+        update_data = {}
         if "title" in args:
-            updates["title"] = args["title"]
-
+            update_data["title"] = args["title"]
         if "notes" in args:
-            updates["notes"] = args["notes"]
+            update_data["notes"] = args["notes"]
         if "is_done" in args:
-            updates["isDone"] = args["is_done"]
-            if args["is_done"]:
-                updates["doneOn"] = asyncio.get_event_loop().time() * 1000
-            else:
-                updates["doneOn"] = None
+            update_data["isDone"] = args["is_done"]
         if "time_estimate" in args:
-            updates["timeEstimate"] = args["time_estimate"]
+            update_data["timeEstimate"] = args["time_estimate"]
         if "time_spent" in args:
-            updates["timeSpent"] = args["time_spent"]
+            update_data["timeSpent"] = args["time_spent"]
         if "tag_ids" in args:
-            updates["tagIds"] = args["tag_ids"]
-
-        return await self.send_command("updateTask", taskId=task_id, data=updates)
+            update_data["tagIds"] = args["tag_ids"]
+        return await self.send_command("updateTask", taskId=task_id, data=update_data)
 
     async def complete_and_archive_task(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Complete a task (mark as done) - true deletion is not supported"""
         task_id = args.get("task_id")
         if not task_id:
             return {"success": False, "error": "task_id is required"}
-
-        # Mark task as done instead of deleting
         return await self.send_command("setTaskDone", taskId=task_id)
 
     async def get_projects(self, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -457,8 +565,31 @@ class SuperProductivityMCPServer:
             "description": args.get("description", ""),
             "color": args.get("color", "#2196F3"),
         }
-
         return await self.send_command("addProject", data=project_data)
+
+    async def update_project(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Update an existing project"""
+        updates = {}
+        if "title" in args:
+            updates["title"] = args["title"]
+        if "description" in args:
+            updates["description"] = args["description"]
+        if "color" in args:
+            updates["theme"] = {"primary": args["color"]}
+        if "is_archived" in args:
+            updates["isArchived"] = args["is_archived"]
+        return await self.send_command("updateProject", data=updates, projectId=args["project_id"])
+
+    async def get_current_context_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Get tasks for current context"""
+        return await self.send_command("getCurrentContextTasks")
+
+    async def reorder_tasks(self, args: Dict[str, Any]) -> Dict[str, Any]:
+        """Reorder tasks"""
+        return await self.send_command("reorderTasks", 
+                                     taskIds=args["task_ids"], 
+                                     contextId=args["context_id"], 
+                                     contextType=args["context_type"])
 
     async def get_tags(self, args: Dict[str, Any]) -> Dict[str, Any]:
         """Get all tags"""
@@ -470,7 +601,6 @@ class SuperProductivityMCPServer:
             "title": args.get("title", ""),
             "color": args.get("color", "#FF9800"),
         }
-
         return await self.send_command("addTag", data=tag_data)
 
     async def update_tag(self, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -478,7 +608,6 @@ class SuperProductivityMCPServer:
         tag_id = args.get("tag_id")
         if not tag_id:
             return {"success": False, "error": "tag_id is required"}
-
         updates = {}
         if "title" in args:
             updates["title"] = args["title"]
@@ -486,8 +615,6 @@ class SuperProductivityMCPServer:
             updates["color"] = args["color"]
         if "icon" in args:
             updates["icon"] = args["icon"]
-
-        # Handle theme updates specially
         if "theme_primary_color" in args:
             updates["theme"] = {
                 "primary": args["theme_primary_color"],
@@ -499,7 +626,6 @@ class SuperProductivityMCPServer:
                 "isAutoContrast": True,
                 "isDisableBackgroundTint": False,
             }
-
         return await self.send_command("updateTag", tagId=tag_id, data=updates)
 
     async def delete_tag(self, args: Dict[str, Any]) -> Dict[str, Any]:
@@ -536,8 +662,6 @@ class SuperProductivityMCPServer:
     async def run(self):
         """Run the MCP server"""
         logging.info("Starting Super Productivity MCP Server...")
-
-        # Initialize server
         async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
             await self.server.run(
                 read_stream,
@@ -552,12 +676,10 @@ class SuperProductivityMCPServer:
                 ),
             )
 
-
 async def main():
     """Main entry point"""
     server = SuperProductivityMCPServer()
     await server.run()
-
 
 if __name__ == "__main__":
     asyncio.run(main())
