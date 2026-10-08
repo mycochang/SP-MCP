@@ -5,7 +5,16 @@ from state_manager import StateManager
 from logic_core import LogicCore
 
 # Configuration
-SP_PLUGIN_DIR = os.path.expanduser("~/.config/superProductivity/plugin_commands")
+def get_sp_plugin_dir():
+    if os.name == "nt":  # Windows
+        data_dir = os.environ.get("APPDATA", os.path.expanduser("~\\AppData\\Roaming"))
+    elif sys.platform == "darwin":  # macOS
+        data_dir = os.path.expanduser("~/Library/Application Support")
+    else:  # Linux
+        data_dir = os.environ.get("XDG_DATA_HOME", os.path.expanduser("~/.local/share"))
+    return os.path.join(data_dir, "super-productivity-mcp", "plugin_commands")
+
+SP_PLUGIN_DIR = get_sp_plugin_dir()
 TEMP_GCAL_FILE = "sync_agent/temp_gcal.json"
 TEMP_SP_FILE = "sync_agent/temp_sp_tasks.json"
 
@@ -78,7 +87,7 @@ def main():
             try:
                 dt = start_time.split('T')[1][:5]
                 time_str = f"{dt} "
-            except:
+            except Exception:
                 pass
 
         new_task = {

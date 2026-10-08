@@ -191,14 +191,19 @@ async function runTests() {
         if (!call) throw new Error('deleteTag not called');
     });
 
-    // 11. create_board -> createBoard -> dispatchAction
+    // 11. create_board -> createBoard -> persistDataSynced
     await test('create_board', {
         action: 'createBoard',
         data: { title: 'Board', panels: [] }
     }, () => {
-        const call = PluginAPI.calls.find(c => c.method === 'dispatchAction');
-        if (!call) throw new Error('dispatchAction not called');
-        if (call.args[0].type !== '[Boards] Add Board') throw new Error('Wrong action type');
+        const call = PluginAPI.calls.find(c => c.method === 'persistDataSynced');
+        if (!call) throw new Error('persistDataSynced not called');
+        if (call.args[0] !== 'boards') throw new Error(`Wrong Key: ${call.args[0]}`);
+        const boardsData = call.args[1];
+        if (!boardsData.boardCfgs || boardsData.boardCfgs.length === 0) {
+            throw new Error('No boards in persisted data');
+        }
+        if (boardsData.boardCfgs[0].title !== 'Board') throw new Error('Wrong board title');
     });
 
     // 12. show_notification -> showSnack
