@@ -56,6 +56,11 @@ global.PluginAPI = {
         return null;
     },
 
+    persistDataSynced: async (key, data) => {
+        global.PluginAPI.calls.push({ method: 'persistDataSynced', args: [key, data] });
+        return { success: true };
+    },
+
     // Stubs to prevent crashes
     registerHook: () => {},
     registerMenuEntry: () => {},

@@ -6,3 +6,6 @@ venv/
 .env
 sync_agent/*.json
 VERIFICATION_REPORT_*.md
+*.webm
+*.exe
+.gemini/
