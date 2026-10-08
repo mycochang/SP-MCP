@@ -450,6 +450,17 @@ class MCPBridgePlugin {
         // Task operations
         case 'getTasks':
           result = await PluginAPI.getTasks();
+          if (result && result.length > 0) {
+             // DEBUG: Log the first task keys to see if we are missing anything
+             const sample = result.find(t => t.issueType === 'TRELLO');
+             if (sample) {
+                 await this.log(`[DEBUG] Keys for Trello Task: ${Object.keys(sample).join(', ')}`);
+                 // If issueData exists, log its keys too
+                 if (sample.issueData) {
+                     await this.log(`[DEBUG] issueData keys: ${Object.keys(sample.issueData).join(', ')}`);
+                 }
+             }
+          }
           break;
           
         case 'getArchivedTasks':
@@ -571,7 +582,29 @@ class MCPBridgePlugin {
 
         // Project operations
         case 'getAllProjects':
-          result = await PluginAPI.getAllProjects();
+          try {
+            // Attempt to get from standard API first
+            let projects = await PluginAPI.getAllProjects();
+            
+            // Supplement/verify with raw project data to ensure we don't miss any active projects
+            // (Standard API occasionally misses projects with 0 tasks or new projects)
+            const projectState = await PluginAPI.loadSyncedData('PROJECT');
+            if (projectState && projectState.entities) {
+               const rawProjects = Object.values(projectState.entities);
+               const activeRawProjects = rawProjects.filter(p => !p.isArchived);
+               
+               // Use raw data if it contains more active projects than the API result
+               const apiCount = Array.isArray(projects) ? projects.length : 0;
+               if (activeRawProjects.length > apiCount) {
+                 await this.log(`[DEBUG] getAllProjects discrepancy detected: API returns ${apiCount}, Raw State contains ${activeRawProjects.length}. Using raw data.`);
+                 projects = activeRawProjects;
+               }
+            }
+            result = projects;
+          } catch (error) {
+            await this.log(`[ERROR] getAllProjects failed: ${error.message}`);
+            throw error;
+          }
           break;
           
         case 'addProject':
