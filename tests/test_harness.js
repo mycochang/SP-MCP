@@ -49,6 +49,17 @@ global.PluginAPI = {
         global.PluginAPI.calls.push({ method: 'dispatchAction', args: [action] });
         return { success: true };
     },
+    
+    loadSyncedData: async (key) => {
+        global.PluginAPI.calls.push({ method: 'loadSyncedData', args: [key] });
+        // Return null by default, can be overridden in tests
+        return null;
+    },
+
+    persistDataSynced: async (key, data) => {
+        global.PluginAPI.calls.push({ method: 'persistDataSynced', args: [key, data] });
+        return { success: true };
+    },
 
     // Stubs to prevent crashes
     registerHook: () => {},

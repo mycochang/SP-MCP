@@ -134,12 +134,16 @@ async function runTests() {
         
         await plugin.executeCommand(cmdInfo);
         
-        const call = PluginAPI.calls.find(c => c.method === 'dispatchAction');
-        if (!call) throw new Error('PluginAPI.dispatchAction was NOT called.');
+        const call = PluginAPI.calls.find(c => c.method === 'persistDataSynced');
+        if (!call) throw new Error('PluginAPI.persistDataSynced was NOT called.');
         
-        const action = call.args[0];
-        if (action.type !== '[Boards] Add Board') throw new Error(`Wrong Action Type: ${action.type}`);
-        if (action.board.title !== 'New Board') throw new Error(`Wrong Data: ${JSON.stringify(action.board)}`);
+        if (call.args[0] !== 'boards') throw new Error(`Wrong Key: ${call.args[0]}`);
+        const boardsData = call.args[1];
+        if (!boardsData.boardCfgs || boardsData.boardCfgs.length === 0) {
+            throw new Error('No boards in persisted data');
+        }
+        const board = boardsData.boardCfgs[0];
+        if (board.title !== 'New Board') throw new Error(`Wrong Data: ${JSON.stringify(board)}`);
         
         console.log('✅ PASS');
         passed++;
